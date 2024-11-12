@@ -1,11 +1,38 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Container from 'react-bootstrap/esm/Container'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 const EventBooking = () => {
+
+    const [eventBookingData,setEventBookingData] = useState([])
+
+
+
+
+
+    const  getDataHandler = async ()=>{
+
+        const token = localStorage.getItem('token');
+        const get_response = await  axios.get(import.meta.env.VITE_BACKEND_API + 'eventsBooking',{
+            headers: { Authorization: token }
+        });
+        if(get_response?.data){
+            setEventBookingData(get_response?.data)
+        }
+    }
+
+
+    useEffect(()=>{
+
+        getDataHandler();
+
+    },[])
+
+
     const columns = [
         {
             name: 'Booking ID',
@@ -58,15 +85,7 @@ const EventBooking = () => {
         }
     ]
 
-    const [records, setRecords]=useState(data);
-
-    function handleFilter(event) {
-        const newData = data.filter(row=> {
-            return row.name.toLowerCase().includes(event.target.value.toLowerCase())
-        })
-        setRecords(newData)
-    }
-
+   
     // Custom styles for the table
 const customStyles = {
     headCells: {
@@ -81,6 +100,7 @@ const customStyles = {
       },
     },
   };
+
     return (
         <React.Fragment>
             <Header />
@@ -95,13 +115,13 @@ const customStyles = {
                         </div>
                     </div>
                     <div className="mt-3">
-                        <div className="d-flex justify-content-between mb-3">
+                        <div className="d-flex justify-content-end mb-3">
                             <Link className='btn btn-primary' to="/events/add-booking">Add Booking</Link>
-                            <input type="text" onChange={handleFilter} />
+                            {/* <input type="text" onChange={handleFilter} /> */}
                         </div>
                         <DataTable
                             columns={columns}
-                            data={records}
+                            data={data}
                             fixedHeader
                             pagination
                             customStyles={customStyles}

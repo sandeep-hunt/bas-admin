@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Container from 'react-bootstrap/esm/Container';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -6,12 +6,52 @@ import { Col, Form, Row, Card, Accordion } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AddBlog = ({ username }) => { // Accept username as a prop
-    const [blog, setBlog] = useState({ blog_title: '', blog_shortDesc: '', blog_content: '', blog_author: username || '', blog_slug: '', blog_page_title: '', blog_page_keywords: '', blog_page_desc: '' });
+    const navigator = useNavigate();
+    const [blog, setBlog] = useState({ blog_title: '', blog_shortDesc: '', blog_content: '', blog_author: username || '', blog_slug: '', blog_page_title: '', blog_page_keywords: '', blog_page_desc: '',blog_category:null });
     const [selectedFiles, setSelectedFiles] = useState({ image1: null, image2: null });
     const [previews, setPreviews] = useState({ image1: '', image2: '' });
     const [error, setError] = useState('');
+    const[categoryData,setCategoryData]=useState([]);
+
+    const fetchData = async () => {
+        try {
+              const token = localStorage.getItem('token');
+
+          axios.get(import.meta.env.VITE_BACKEND_API + 'category', {
+                    headers: { Authorization: token }
+                })
+                .then(response => {
+                               if( response?.data?.length !== 0 ){
+                                setCategoryData(response?.data);
+                                // setLoading(false);
+                               }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching Category:', error);
+                                setCategoryData([])
+                                // setLoading(false);  // In case of an error, also stop loading
+                            });
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    
+
+    fetchData();
+}, []);
+
+const options = categoryData?.map((val, i) => {
+    return (
+      <option value={val?.category_id} key={i}>
+        {val?.category_name}
+      </option>
+    )});
 
     // Function to generate slug from title
     const generateSlug = (title) => {
@@ -55,6 +95,8 @@ const AddBlog = ({ username }) => { // Accept username as a prop
         formData.append('blog_page_title', blog.blog_page_title);
         formData.append('blog_page_keywords', blog.blog_page_keywords);
         formData.append('blog_page_desc', blog.blog_page_desc);
+        formData.append('blog_category', blog.blog_category);
+        
 
         if (selectedFiles.image1) {
             formData.append('image1', selectedFiles.image1);
@@ -62,18 +104,22 @@ const AddBlog = ({ username }) => { // Accept username as a prop
         if (selectedFiles.image2) {
             formData.append('image2', selectedFiles.image2);
         }
+        const token = localStorage.getItem('token');
 
         axios.post(`${import.meta.env.VITE_BACKEND_API}blogs/add`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+            headers: {  Authorization: token  }
         })
             .then(response => {
                 alert('Blog added successfully');
+                navigator(`/blogs`)
             })
             .catch(error => {
                 console.error('Error adding blog:', error);
                 setError('Failed to add blog');
             });
     };
+
+ 
 
     return (
         <React.Fragment>
@@ -128,6 +174,23 @@ const AddBlog = ({ username }) => { // Accept username as a prop
                                             required
                                         />
                                     </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>
+                                            Categories <span style={{ color: 'red' }}>*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            name="blog_category"
+                                            value={blog.category} 
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">Select Category</option>
+                                            {options}
+                                        </Form.Control>
+                                    </Form.Group>
+
 
                                     <Form.Group className="mb-3">
                                         <Form.Label>Content <span style={{ color: 'red' }}>*</span></Form.Label>

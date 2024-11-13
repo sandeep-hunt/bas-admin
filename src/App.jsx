@@ -23,7 +23,6 @@ import Settings from './pages/Settings.jsx';
 import Messages from './pages/Messages.jsx';
 
 function App() {
-  console.log('screen');
   return (
     <Routes>
       <Route path="/" element={<Login />} />

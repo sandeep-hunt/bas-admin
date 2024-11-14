@@ -4,151 +4,143 @@ import { Button, Card, Col, Container, Row, Form } from 'react-bootstrap';
 
 
 export default function SiteSetting() {
+  const [settingId, setSettingId] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
 
-    const [settingId,setSettingId]=useState(null);
+  const [formData, setFormData] = useState({
+    site_title: '',
+    site_keywords: '',
+    site_description: '',
+    site_copyright: '',
+    contact_address: '',
+    contact_mobile: '',
+    contact_email: '',
+    facebook_url: '',
+    twitter_url: '',
+    insta_url: '',
+    linkedin_url: '',
+    youtube_url: '',
+    call_to_action: ''
+  });
 
-    const [isEdit,setIsEdit]=useState(false)
+  const [siteLogo, setSiteLogo] = useState(null);
+  const [siteFavicon, setSiteFavicon] = useState(null);
+  const [siteSecondaryLogo, setSiteSecondaryLogo] = useState(null);
 
-    const [formData, setFormData] = useState({
-        site_title: '',
-        site_keywords: '',
-        site_description: '',
-        site_copyright: '',
-        contact_address: '',
-        contact_mobile: '',
-        contact_email: '',
-        facebook_url: '',
-        twitter_url: '',
-        insta_url: '',
-        linkedin_url: '',
-        youtube_url: '',
-        call_to_action: ''
+  const [imagePreviewLogo, setImagePreviewLogo] = useState("");
+  const [imagePreviewFavicon, setImagePreviewFavicon] = useState("");
+  const [imagePreviewSecondaryLogo, setImagePreviewSecondaryLogo] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    const [siteLogo, setSiteLogo] = useState(null);
-    const [siteFavicon, setSiteFavicon] = useState(null);
+    setIsEdit(true);
+  };
 
-    const [imagePreviewLogo,setImagePreviewLogo] =useState("");
-    const [imagePreviewFavicon,setImagePreviewFavicon] =useState("")
+  const handleFileChange = (e) => {
+    setIsEdit(true);
+    const { name, files } = e.target;
+    const file = files[0];
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-        setIsEdit(true)
-    };
-
-    const handleFileChange = (e) => {
-        setIsEdit(true)
-        const { name, files } = e.target;
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
         if (name === 'site_logo') {
-            setSiteLogo(files[0]);
+          setSiteLogo(file);
+          setImagePreviewLogo(reader.result);
         } else if (name === 'site_favicon') {
-            setSiteFavicon(files[0]);
-        }
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (name === 'site_logo') {
-                    setImagePreviewLogo(reader.result)
-                } else if (name === 'site_favicon') {
-                    setImagePreviewFavicon(reader.result)
-                }
-            };
-            reader.readAsDataURL(file);
-        } else {
-            if (name === 'site_logo') {
-                setImagePreviewLogo('')
-            } else if (name === 'site_favicon') {
-                setImagePreviewFavicon('')
-            }
-        }
-    };
-
-
-
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          const response = await axios.get(import.meta.env.VITE_BACKEND_API + 'setting', {
-            headers: { Authorization: token },
-          });
-    
-          if (response?.data) {
-            const data = response.data?.result?.[0];
-            // Update the formData state with the fetched data
-            setFormData({
-              site_title: data.site_title || '',
-              site_keywords: data.site_keywords || '',
-              site_description: data.site_description || '',
-              site_copyright: data.site_copyright || '',
-              contact_address: data.contact_address || '',
-              contact_mobile: data.contact_mobile || '',
-              contact_email: data.contact_email || '',
-              facebook_url: data.facebook_url || '',
-              twitter_url: data.twitter_url || '',
-              insta_url: data.insta_url || '',
-              linkedin_url: data.linkedin_url || '',
-              youtube_url: data.youtube_url || '', 
-              call_to_action: data.call_to_action || ''
-            });
-            setSettingId(data?.settings_id);
-            const site_logo = import.meta.env.VITE_BACKEND_API + data?.site_logo;
-            const site_favicon = import.meta.env.VITE_BACKEND_API + data?.site_favicon;
-            setImagePreviewLogo(site_logo)
-            setImagePreviewFavicon(site_favicon)
-          }
-        } catch (error) {
-          console.error('Error fetching Site Settings:', error);
+          setSiteFavicon(file);
+          setImagePreviewFavicon(reader.result);
+        } else if (name === 'site_secondary_logo') {
+          setSiteSecondaryLogo(file);
+          setImagePreviewSecondaryLogo(reader.result);
         }
       };
-    
-      useEffect(() => {
-        window.scrollTo(0, 0);
-        fetchData();
-      }, []);
+      reader.readAsDataURL(file);
+    } else {
+      if (name === 'site_logo') {
+        setImagePreviewLogo('');
+      } else if (name === 'site_favicon') {
+        setImagePreviewFavicon('');
+      } else if (name === 'site_secondary_logo') {
+        setImagePreviewSecondaryLogo('');
+      }
+    }
+  };
 
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(import.meta.env.VITE_BACKEND_API + 'setting', {
+        headers: { Authorization: token },
+      });
 
+      if (response?.data) {
+        const data = response.data?.result?.[0];
+        setFormData({
+          site_title: data.site_title || '',
+          site_keywords: data.site_keywords || '',
+          site_description: data.site_description || '',
+          site_copyright: data.site_copyright || '',
+          contact_address: data.contact_address || '',
+          contact_mobile: data.contact_mobile || '',
+          contact_email: data.contact_email || '',
+          facebook_url: data.facebook_url || '',
+          twitter_url: data.twitter_url || '',
+          insta_url: data.insta_url || '',
+          linkedin_url: data.linkedin_url || '',
+          youtube_url: data.youtube_url || '',
+          call_to_action: data.call_to_action || ''
+        });
+        setSettingId(data?.settings_id);
+        setImagePreviewLogo(import.meta.env.VITE_BACKEND_API + data?.site_logo);
+        setImagePreviewFavicon(import.meta.env.VITE_BACKEND_API + data?.site_favicon);
+        setImagePreviewSecondaryLogo(import.meta.env.VITE_BACKEND_API + data?.site_secondary_logo);
+      }
+    } catch (error) {
+      console.error('Error fetching Site Settings:', error);
+    }
+  };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-
-    // Create FormData instance
     const data = new FormData();
-        
-    // Append text fields
+
     Object.keys(formData).forEach((key) => {
-        data.append(key, formData[key]);
+      data.append(key, formData[key]);
     });
 
-    // Append file fields
     if (siteLogo) {
-        data.append('site_logo', siteLogo);
+      data.append('site_logo', siteLogo);
     }
     if (siteFavicon) {
-        data.append('site_favicon', siteFavicon);
+      data.append('site_favicon', siteFavicon);
+    }
+    if (siteSecondaryLogo) {
+      data.append('site_secondary_logo', siteSecondaryLogo);
     }
 
-    
     try {
-        const response = await axios.put(import.meta.env.VITE_BACKEND_API + `setting/update/${settingId}`,data, {
-            headers: { Authorization: token }
-        });
-
-        alert(response?.data?.message);
-       
+      const response = await axios.put(import.meta.env.VITE_BACKEND_API + `setting/update/${settingId}`, data, {
+        headers: { Authorization: token },
+      });
+      alert(response?.data?.message);
     } catch (error) {
-        console.log("error",error)
-        if (error.response) {
-            alert(`Error: ${error.response.data.error || 'An unexpected error occurred.'}`);
-        } else if (error.request) {
-            alert("No response from the server. Please try again later.");
-        } else {
-            alert("An error occurred while making the request. Please try again.");
-        }
+      if (error.response) {
+        alert(`Error: ${error.response.data.error || 'An unexpected error occurred.'}`);
+      } else if (error.request) {
+        alert("No response from the server. Please try again later.");
+      } else {
+        alert("An error occurred while making the request. Please try again.");
+      }
     }
   };
 
@@ -326,19 +318,19 @@ export default function SiteSetting() {
                 </Col>
 
                 {/* Site Favicon */}
-                <Col md={6}>
-                           
+                <Col md={4}>
+
                   <Form.Group className="mb-3">
                     <Form.Label>Site Favicon</Form.Label>
-                     {imagePreviewFavicon && (
-                                <div className="mb-3">
-                                    <img
-                                        src={imagePreviewFavicon}
-                                        alt="Preview"
-                                        style={{ width: '200px', height: '100px' }}
-                                    />
-                                </div>
-                            )}
+                    {imagePreviewFavicon && (
+                      <div className="mb-3">
+                        <img
+                          src={imagePreviewFavicon}
+                          alt="Preview"
+                          style={{ width: '200px', height: '100px' }}
+                        />
+                      </div>
+                    )}
                     <Form.Control
                       type="file"
                       name="site_favicon"
@@ -348,21 +340,42 @@ export default function SiteSetting() {
                 </Col>
 
                 {/* Site Logo */}
-                <Col md={6}>
+                <Col md={4}>
                   <Form.Group className="mb-3">
                     <Form.Label>Site Logo</Form.Label>
                     {imagePreviewLogo && (
-                                <div className="mb-3">
-                                    <img
-                                        src={imagePreviewLogo}
-                                        alt="Preview"
-                                        style={{ width: '200px', height: '100px' }}
-                                    />
-                                </div>
-                            )}
+                      <div className="mb-3">
+                        <img
+                          src={imagePreviewLogo}
+                          alt="Preview"
+                          style={{ width: '200px', height: '100px' }}
+                        />
+                      </div>
+                    )}
                     <Form.Control
                       type="file"
                       name="site_logo"
+                      onChange={handleFileChange}
+                    />
+                  </Form.Group>
+                </Col>
+
+                {/* Site Secondary Logo */}
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Site Secondary Logo</Form.Label>
+                    {imagePreviewSecondaryLogo && (
+                      <div className="mb-3">
+                        <img
+                          src={imagePreviewSecondaryLogo}
+                          alt="Preview"
+                          style={{ width: '200px', height: '100px' }}
+                        />
+                      </div>
+                    )}
+                    <Form.Control
+                      type="file"
+                      name="site_secondary_logo"
                       onChange={handleFileChange}
                     />
                   </Form.Group>
@@ -384,7 +397,7 @@ export default function SiteSetting() {
 
                 {/* Submit Button */}
                 {<Col md={12}>
-                  <Button type="submit"  disabled = {!isEdit}>Update Site Settings</Button>
+                  <Button type="submit" disabled={!isEdit}>Update Site Settings</Button>
                 </Col>}
               </Row>
             </Form>

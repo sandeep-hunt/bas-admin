@@ -24,8 +24,11 @@ const Events = () => {
         event_date: '',
         event_time: '',
         event_location: '',
-        event_status: '',
+        event_status: '1',
+        event_booking_count:0,
     });
+
+    console.log("formData",formData)
     const [imagePreview, setImagePreview] = useState(null);
     const [thumbnailPreview, setThumbnailPreview] = useState(null); // Added thumbnail preview
     const [events, setEvents] = useState([]);
@@ -35,6 +38,9 @@ const Events = () => {
     const [limit] = useState(8);
     const [currentEventId, setCurrentEventId] = useState(null);
 
+
+    console.log("event_booking_count",events)
+
     useEffect(() => {
         fetchEvents();
     }, [currentPage, limit]);
@@ -42,9 +48,7 @@ const Events = () => {
     const fetchEvents = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(import.meta.env.VITE_BACKEND_API + 'events', {
-                params: { page: currentPage, limit: limit },
-            });
+            const response = await axios.get(import.meta.env.VITE_BACKEND_API + 'events',);
             setEvents(response.data.items);
             setCurrentPage(response.data.currentPage);
             setTotalPages(response.data.totalPages);
@@ -125,6 +129,7 @@ const Events = () => {
             event_time: event.event_time,
             event_location: event.event_location,
             event_status: event.event_status,
+            event_booking_count:event?.event_booking_count
         });
         setCurrentEventId(event.event_id);
         const new_imgPrev = import.meta.env.VITE_BACKEND_API + event.event_image;
@@ -202,14 +207,19 @@ const Events = () => {
                                                 <h6>{event.event_time}</h6>
                                                 <h6>&#8377; {event.event_price}</h6>
                                                 <h6>{event.event_status == '1' ? 'active' : 'finished'}</h6>
+                                                <h6 className='my-2 text-sm'>Event Booking Status {event?.event_booking_count}</h6>
+                                                { 
+                                                
+                                                parseInt(event.event_status) === 1 &&
+                                                
                                                 <Row>
                                                     <Col sm={12} md={6}>
                                                         <Button variant="primary btn-sm" onClick={() => handleEdit(event)}>Edit</Button>
                                                     </Col>
-                                                    <Col sm={12} md={6}>
+                                                   {event?.event_booking_count  === 0 && <Col sm={12} md={6}>
                                                         <Button variant="outline-danger btn-sm" onClick={() => handleDelete(event.event_id)}>Delete</Button>
-                                                    </Col>
-                                                </Row>
+                                                    </Col>}
+                                                </Row>}
                                             </Card.Title>
                                         </Card.Body>
                                     </Card>
@@ -264,6 +274,7 @@ const Events = () => {
                                     onChange={handleFormChange}
                                     placeholder="Event Name"
                                     required
+                                    disabled={formData?.event_booking_count !== 0 && true}
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -275,13 +286,17 @@ const Events = () => {
                                     onChange={handleFormChange}
                                     placeholder="Event Slug"
                                     required
+                                    disabled={formData?.event_booking_count !== 0 && true}
                                 />
                             </Form.Group>
                             <Row>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Event Image</Form.Label>
-                                        <Form.Control type="file" name="event_image" onChange={handleFileChange} />
+                                        <Form.Control type="file" name="event_image" onChange={handleFileChange}
+                                        
+                                        disabled={formData?.event_booking_count !== 0 && true}
+                                        />
                                         {/* Image preview */}
                                         {imagePreview && (
                                             <img src={imagePreview} alt="preview" style={{ marginTop: '10px', width: '100%', height: 'auto' }} />
@@ -291,7 +306,9 @@ const Events = () => {
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Event Thumbnail</Form.Label>
-                                        <Form.Control type="file" name="event_thumbnail" onChange={handleThumbnailChange} />
+                                        <Form.Control type="file" name="event_thumbnail" onChange={handleThumbnailChange}
+                                        disabled={formData?.event_booking_count !== 0 && true}
+                                        />
                                         {/* Thumbnail preview */}
                                         {thumbnailPreview && (
                                             <img src={thumbnailPreview} alt="thumbnail preview" style={{ marginTop: '10px', width: '100%', height: 'auto' }} />
@@ -308,6 +325,7 @@ const Events = () => {
                                             onChange={handleFormChange}
                                             placeholder="Event Price"
                                             required
+                                            disabled={formData?.event_booking_count !== 0 && true}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -345,6 +363,7 @@ const Events = () => {
                                             onChange={handleFormChange}
                                             placeholder="Event Location"
                                             required
+                                            disabled={formData?.event_booking_count !== 0 && true}
                                         />
                                     </Form.Group>
                                 </Col>

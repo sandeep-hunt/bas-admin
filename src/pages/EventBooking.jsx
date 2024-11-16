@@ -17,11 +17,15 @@ const EventBooking = () => {
     const  getDataHandler = async ()=>{
 
         const token = localStorage.getItem('token');
-        const get_response = await  axios.get(import.meta.env.VITE_BACKEND_API + 'eventsBooking',{
-            headers: { Authorization: token }
-        });
-        if(get_response?.data){
-            setEventBookingData(get_response?.data)
+        try {
+            const get_response = await  axios.get(import.meta.env.VITE_BACKEND_API + 'eventsBooking',{
+                headers: { Authorization: token }
+            });
+            if(get_response?.data){
+                setEventBookingData(get_response?.data)
+            }
+        } catch (error) {
+            setEventBookingData([])
         }
     }
 
@@ -64,26 +68,40 @@ const EventBooking = () => {
             selector: row => row.status,
             sortable: true
         },
-        {
-            name: 'Action',
-            selector: row => row.action,
-            sortable: true
-        }
+        // {
+        //     name: 'Action',
+        //     selector: row => row.action,
+        //     sortable: true
+        // }
     ];
-    const data = [
-        {
-            id: 1,
-            name: 'arif',
-            email: 'fdfsd',
-            mobile: 'sdfghjk',
-            date: 'dfghdjfdigjdfoigjdiofgbjdf',
-            status: '26 march 2024',
-            action: <>
-                <Link className='btn btn-primary btn-sm' to="/">Edit</Link>
-                <Link className='btn btn-outline-danger btn-sm' to="/">Delete</Link>
-            </>
+    const data = eventBookingData?.map((val,i) => {
+        // Ensure event_booking_dob is a valid Date object
+        const date = new Date(val?.event_booking_dob);
+        
+        // Check if the date is valid
+        const formattedDate = date instanceof Date && !isNaN(date)
+            ? new Intl.DateTimeFormat('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(date)
+            : ''; // Return empty string if the date is invalid
+    
+        return {
+            key:val?.event_booking_id,
+            id: i+1,
+            name: val?.event_name,
+            email: val?.event_booking_email,
+            mobile: val?.event_booking_contact,
+            date: formattedDate,
+            status: val?.payment_status,
+            // action: <>
+            //     <Link className='btn btn-primary btn-sm' to="/">Edit</Link>
+            //     <Link className='btn btn-outline-danger btn-sm' to="/">Delete</Link>
+            // </>
         }
-    ]
+    });
+    
 
    
     // Custom styles for the table
@@ -115,10 +133,10 @@ const customStyles = {
                         </div>
                     </div>
                     <div className="mt-3">
-                        <div className="d-flex justify-content-end mb-3">
+                        {/* <div className="d-flex justify-content-end mb-3">
                             <Link className='btn btn-primary' to="/events/add-booking">Add Booking</Link>
-                            {/* <input type="text" onChange={handleFilter} /> */}
-                        </div>
+                            <input type="text" onChange={handleFilter} />
+                        </div> */}
                         <DataTable
                             columns={columns}
                             data={data}

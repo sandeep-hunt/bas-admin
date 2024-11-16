@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import axios from "axios";
+import { Link } from 'react-router-dom'
 
 
 const Dashboard = () => {
@@ -90,7 +91,7 @@ const eventsData = apiData?.recent?.length > 0 ?
             <div className="block break-all text-sm font-medium leading-4">{event?.event_price}</div>
           </div>
         </div>
-        <button className="p-2 border-b rounded-b text-lg font-semibold bg-green-600 text-white">Book Now</button>
+        {/* <button className="p-2 border-b rounded-b text-lg font-semibold bg-green-600 text-white">Book Now</button> */}
       </div>
     );
   })
@@ -127,9 +128,9 @@ const eventsData = apiData?.recent?.length > 0 ?
         <div>
           <div className="flex justify-between items-center m-5">
             <h1 className="text-2xl font-bold ">Recent Event</h1>
-            <button type="button" className="  border p-2 rounded text-center text-sm font-semibold bg-green-600 text-white">
+           <Link to={`/events`}> <button type="button" className="  border p-2 rounded text-center text-sm font-semibold bg-green-600 text-white">
               View More
-            </button>
+            </button></Link>
           </div>
 
           <div className="flex flex-row  gap-4 justify-between items-center m-5 max-lg:flex-wrap min-[1024px]:flex-nowrap  ">

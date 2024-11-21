@@ -21,6 +21,7 @@ import AddBooking from './pages/AddBooking';
 import Category from './pages/Category.jsx';
 import Settings from './pages/Settings.jsx';
 import Messages from './pages/Messages.jsx';
+import Donation from './pages/Donation.jsx';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
       <Route path="/events/add-booking" element={<Protected><AddBooking /></Protected>} />
       <Route path="/settings" element={<Protected><Settings /></Protected>} />
       <Route path="/messages" element={<Protected><Messages /></Protected>} />
+      <Route path="/donation" element={<Protected><Donation /></Protected>} />
 
       <Route path="/profile" element={<Protected><Profile /></Protected>} />
     </Routes>

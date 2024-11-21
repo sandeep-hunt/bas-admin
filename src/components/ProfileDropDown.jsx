@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
  const ProfileDropDown = () =>{
 
     const userData = JSON.parse( localStorage.getItem('userData'));
-    const profile_name = userData?.user_name?.split("");
+    const profile_name = userData?.full_name?.split("");
 
     const handleLogout = () => {
 
@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom'
                 <p className='-mt-1 uppercase'>{profile_name[0]}</p>
             </div>
             <div className='flex flex-col '>
-                <div className='block text-sm font-bold leading-4 break-all'>{userData?.user_name}</div>
+                <div className='block text-sm font-bold leading-4 break-all'>{userData?.full_name}</div>
                 <div className=" block text-sm font-medium leading-4 break-all ">{userData?.email}</div>
             </div>
         </div>

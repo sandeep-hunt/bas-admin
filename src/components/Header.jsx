@@ -11,7 +11,7 @@ import ProfileDropDown from './ProfileDropDown';
 function Header() {
 
   const userData = JSON?.parse( localStorage.getItem('userData'));
-  const profile_name = userData?.user_name?.split("");
+  const profile_name = userData?.full_name?.split("");
 
   const handleLogout = () => {
 
@@ -54,6 +54,7 @@ function Header() {
                   <Nav.Link as={Link} to="/members">Members</Nav.Link>
                   <Nav.Link as={Link} to="/gallery">Gallery</Nav.Link>
                   <Nav.Link as={Link} to="/messages">Messages</Nav.Link>
+                  <Nav.Link as={Link} to="/donation">Donation</Nav.Link>
                   {/* <Nav.Link onClick={handleLogout}>Logout</Nav.Link> */}
                   <div className=' relative flex group cursor-pointer'>
                       <div className=' relative p-1 min-w-[40px] min-h-[40px] rounded-full bg-[#007bff]  text-[#FFFFFF] text-lg font-medium leading-4 text-center flex justify-center items-center'>

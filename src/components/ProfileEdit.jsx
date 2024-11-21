@@ -11,9 +11,13 @@ export default function ProfileEdit() {
 
     const [formData, setFormData] = useState({
         id: userData?.user_id,
-        username: userData?.user_name,
-        email: userData?.email
+        full_name: userData?.full_name,
+        email: userData?.email,
+        user_profile:null
     });
+
+    const [siteLogo, setSiteLogo] = useState(null);
+    const [imagePreviewLogo, setImagePreviewLogo] = useState("");
 
     const [isEdit, setEdit] = useState(false);
 
@@ -22,9 +26,10 @@ export default function ProfileEdit() {
         if (userData) {
             setFormData({
                 id: userData.user_id,
-                username: userData.user_name,
+                full_name: userData.full_name,
                 email: userData.email
             });
+            setImagePreviewLogo(import.meta.env.VITE_BACKEND_API + userData?.user_profile);
         }
     }, [userData]);
 
@@ -36,6 +41,27 @@ export default function ProfileEdit() {
         }));
         setEdit(true);
     };
+
+    
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    const file = files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (name === 'site_logo') {
+          setSiteLogo(file);
+          setImagePreviewLogo(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (name === 'site_logo') {
+        setImagePreviewLogo('');
+      } 
+    }
+  };
 
     // const updateLocalStorage = (newUserData) => {
     //     const updatedData = {
@@ -52,40 +78,45 @@ export default function ProfileEdit() {
         window.location.href = '/';
     };
 
-    const validateForm = () => {
-        // if (!formData.username || !formData.email) {
-        //     alert('Username and email are required');
-        //     return false;
-        // }
+    // const validateForm = () => {
+    //     // if (!formData.username || !formData.email) {
+    //     //     alert('Username and email are required');
+    //     //     return false;
+    //     // }
 
-        // if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        //     alert('Please enter a valid email address');
-        //     return false;
-        // }
+    //     // if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    //     //     alert('Please enter a valid email address');
+    //     //     return false;
+    //     // }
 
-        if (formData.username === userData?.user_name && 
-            formData.email === userData?.email) {
-            alert('No changes to update');
-            return false;
-        }
+    //     if (formData.full_name === userData?.full_name && 
+    //         formData.email === userData?.email) {
+    //         alert('No changes to update');
+    //         return false;
+    //     }
 
-        return true;
-    };
+    //     return true;
+    // };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!validateForm()) {
-            return;
-        }
-
         // setIsLoading(true);
         const token = localStorage.getItem('token');
+        const data = new FormData();
+
+        Object.keys(formData).forEach((key) => {
+          data.append(key, formData[key]);
+        });
+    
+        if (siteLogo) {
+          data.append('user_profile', siteLogo);
+        }
         
         try {
             const response = await axios.put(
                 `${import.meta.env.VITE_BACKEND_API}update`, 
-                formData, 
+                data, 
                 {
                     headers: { 
                         Authorization: token,
@@ -119,16 +150,40 @@ export default function ProfileEdit() {
                     <Card.Body>
                         <Form onSubmit={handleSubmit}>
                             <Row>
+                                {/* Site Logo */}
+                <Col md={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Profile Image</Form.Label>
+                    {imagePreviewLogo && (
+                      <div className="mb-3  ">
+                        <img
+                          src={imagePreviewLogo}
+                          alt="Preview"
+                          style={{ width: '150px', height: '150px' }}
+                          className=' rounded-full'
+                        />
+                      </div>
+                    )}
+
+                    <Form.Label>Choose new profile image</Form.Label>
+
+                    <Form.Control
+                      type="file"
+                      name="site_logo"
+                      onChange={handleFileChange}
+                    />
+                  </Form.Group>
+                </Col>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>
-                                            Username<span style={{ color: 'red' }}>*</span>
+                                            Full Name<span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
                                         <Form.Control
                                             type="text"
-                                            placeholder="Username"
-                                            name="username"
-                                            value={formData.username || ''}
+                                            placeholder="Full Name"
+                                            name="full_name"
+                                            value={formData.full_name || ''}
                                             onChange={handleChange}
                                             required
                                             // disabled={isLoading}
@@ -154,7 +209,6 @@ export default function ProfileEdit() {
                                 <Col sm={12}>
                                     <Button 
                                         type="submit" 
-                                        disabled={!isEdit}
                                     >
                                          Update
                                     </Button>

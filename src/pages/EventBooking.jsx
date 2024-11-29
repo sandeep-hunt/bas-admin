@@ -4,11 +4,14 @@ import Breadcrumbs from '../components/Breadcrumbs'
 import Container from 'react-bootstrap/esm/Container'
 import DataTable from 'react-data-table-component'
 import { Link } from 'react-router-dom'
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'; 
 import axios from 'axios'
 
 const EventBooking = () => {
 
-    const [eventBookingData,setEventBookingData] = useState([])
+    const [eventBookingData,setEventBookingData] = useState([]);
+    const [loading, setLoading] = useState(true);  // Loading state
 
 
 
@@ -22,10 +25,12 @@ const EventBooking = () => {
                 headers: { Authorization: token }
             });
             if(get_response?.data){
-                setEventBookingData(get_response?.data)
+                setEventBookingData(get_response?.data);
+                setLoading(false);
             }
         } catch (error) {
             setEventBookingData([])
+            setLoading(false);
         }
     }
 
@@ -60,8 +65,6 @@ const EventBooking = () => {
                     headers: { Authorization: token } 
                 }
             );
-    
-            console.log("Refund Response:", response?.data);
     
             // Show success message
             if (response?.data?.message) {
@@ -207,6 +210,39 @@ const customStyles = {
     },
   };
 
+   // Skeleton columns for loading
+   const skeletonColumns = [
+    {
+        name: <Skeleton width={50} />,
+        selector: () => <Skeleton width={50} />,
+    },
+    {
+        name: <Skeleton width={150} />,
+        selector: () => <Skeleton width={150} />,
+    },
+    {
+        name: <Skeleton width={100} />,
+        selector: () => <Skeleton width={100} />,
+    },
+    {
+        name: <Skeleton width={100} />,
+        selector: () => <Skeleton width={100} />,
+    },
+    {
+        name: <Skeleton width={100} />,
+        selector: () => <Skeleton width={100} />,
+    },
+    {
+        name: <Skeleton width={100} />,
+        selector: () => <Skeleton width={100} />,
+    },
+    {
+        name: <Skeleton width={100} />,
+        cell: () => <Skeleton width={100} height={30} />,
+    },
+];
+
+
     return (
         <React.Fragment>
             <Header />
@@ -226,8 +262,8 @@ const customStyles = {
                             <input type="text" onChange={handleFilter} />
                         </div> */}
                         <DataTable
-                            columns={columns}
-                            data={data}
+                            columns={loading ? skeletonColumns : columns}
+                            data={loading ? Array(5).fill({}) : data}
                             fixedHeader
                             pagination
                             customStyles={customStyles}

@@ -202,7 +202,7 @@ export default function Messages() {
                     <div className="mt-3">
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
-                            data={tablelistrowdata}
+                            data={ loading? Array(5).fill({}) :tablelistrowdata}
                             fixedHeader
                             pagination
                             paginationPerPage={5}

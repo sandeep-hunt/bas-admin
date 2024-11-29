@@ -122,6 +122,8 @@ const Blogs = () => {
     fetchData();
 }, []);
 
+console.log("loading",loading)
+
     
 
     // Custom styles for the table
@@ -243,7 +245,7 @@ const Blogs = () => {
                         </div>
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
-                            data={tablelistrowdata}
+                            data={loading ? Array(5).fill({}):tablelistrowdata}
                             fixedHeader
                             pagination
                             paginationPerPage={5}

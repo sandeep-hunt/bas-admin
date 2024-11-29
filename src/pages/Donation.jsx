@@ -236,7 +236,7 @@ const Donation = () => {
                        
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
-                            data={tablelistrowdata}
+                            data={ loading ? Array(5).fill({}) : tablelistrowdata}
                             fixedHeader
                             pagination
                             paginationPerPage={5}

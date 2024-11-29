@@ -8,7 +8,7 @@ import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
 import Modal from 'react-bootstrap/Modal';
-import { Form } from 'react-bootstrap';
+import { Card, Col, Form, Row } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 
 
@@ -19,7 +19,8 @@ const Donation = () => {
 
     const [loading, setLoading] = useState(true);  // Loading state
     const [donationData,setDonationData]= useState([]);
-
+    const [rowData,setRowData] = useState("");
+    const [show, setShow] = useState(false);
   
 
     const tablelistrowdata = donationData?.map((donor, i) => {
@@ -45,6 +46,7 @@ const Donation = () => {
           donation_freq: donor?.donation_freq,
           donate_receipt_no: donor?.donate_receipt_no,
           doner_mobile: donor?.doner_mobile,
+          action:donor
         };
     });
     
@@ -64,7 +66,13 @@ const Donation = () => {
 
     }
 
-   
+    const actionHtmlCellRender = (row) =>{
+        return <>
+        <div onClick={()=>{setRowData(row?.action);handleClose("settingValue")}} className=' border rounded p-2 cursor-pointer '>View</div>
+        </>
+    }
+
+ 
     const columns = [
         {
             name: 'Sno',
@@ -107,6 +115,12 @@ const Donation = () => {
             name: 'Doner Moblie',
             selector: row => row.doner_mobile,
             sortable: true,
+            wrap: true,
+        },
+        {
+            name: 'Action',
+            selector: row => row.action,
+            cell:actionHtmlCellRender,
             wrap: true,
         },
     ];
@@ -195,6 +209,13 @@ const Donation = () => {
         },
     ];
 
+    const handleClose = (value)=>{
+        setShow(!show);
+        if(value !== "settingValue" ){
+            setRowData("")
+        }
+    }
+
     
  
 
@@ -224,6 +245,184 @@ const Donation = () => {
                         />
                     </div>
                 </div>
+                <Modal show={show} onHide={()=>{handleClose("removingValue")}}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{"Donor Details"}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    <Card>
+                            <Card.Body>
+                            <Form >
+                            <Row>
+                                <Col sm={12} md={12}>
+                                    <Row>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Name</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    value={rowData?.doner_name}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Email</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    value={rowData.doner_email}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Address</Form.Label>
+                                                <Form.Control
+                                                    type="email"
+                                                    value={rowData.doner_address}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner City</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    value={rowData.doner_city}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner State</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    value={rowData.doner_state}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Pincode</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                    
+                                                    value={rowData.doner_pincode}
+                                                    disabled
+                                                />
+                                                
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Mobile</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="State"
+                                                    name="state"
+                                                    value={rowData.doner_mobile}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Gender</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                   
+                                                    value={rowData.doner_gender}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Doner Age</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    value={rowData.doner_age}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Donation Payment Id</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                
+                                                    value={rowData?.donation_payment_id}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Donate Receipt No</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                
+                                                    value={rowData?.donate_receipt_no}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Donation Amount</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                
+                                                    value={"Rs."+rowData?.donation_amount}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Donation Period</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                
+                                                    value={
+                                                        rowData?.donation_freq === 0
+                                                            ? "One Time"
+                                                            : rowData?.donation_freq === 1
+                                                            ? "Monthly"
+                                                            : rowData?.donation_freq === 2
+                                                            ? "Yearly"
+                                                            : "Unknown"
+                                                    }
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Donation Created Date</Form.Label>
+                                                <Form.Control
+                                                    type="text"                                                
+                                                    value={
+                                                        rowData?.donation_created_date
+                                                            ? new Date(rowData?.donation_created_date).toLocaleDateString('en-US', { 
+                                                                month: 'short', 
+                                                                day: 'numeric', 
+                                                                year: 'numeric' 
+                                                              })
+                                                            : 'Not Available'
+                                                    }
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Form>
+                            </Card.Body>
+                        </Card>
+                    </Modal.Body>
+                </Modal>
             </Container>
         </React.Fragment>
     );

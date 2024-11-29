@@ -3,10 +3,13 @@ import Header from '../components/Header'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Container from 'react-bootstrap/esm/Container'
 import DataTable from 'react-data-table-component'
-import { Link } from 'react-router-dom'
+import {Link } from 'react-router-dom'
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'; 
 import axios from 'axios'
+import Modal from 'react-bootstrap/Modal';
+import { Card, Col, Form, Row } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
 
 const Members = () => {
 
@@ -45,17 +48,126 @@ const Members = () => {
     fetchData();
 }, []);
 
+const [showPop, setShowPop] = useState(false);
+
+const [rejectedId,setRejectedId] = useState(null);
+
+const [rejectReason,setRejectReason] = useState("");
+
+
+
+const approvedHandler = async (member_id) => {
+    const dataToSubmit = {
+        status: 1, 
+        reject_reason: "", 
+    };
+
+    const token = localStorage.getItem("token");
+
+    try {
+        // API request
+        const response = await axios.put(
+            `${import.meta.env.VITE_BACKEND_API}members/update-member-status/${member_id}`,
+            dataToSubmit,
+            {
+                headers: { Authorization: token },
+            }
+        );
+
+        // Check success response
+        if (response.status === 200) {
+            fetchData();
+            alert("Member approved successfully!");
+        }
+    } catch (error) {
+        // Handle errors
+        if (error.response) {
+        
+            alert(error.response.data.error);  
+        } else if (error.request) {
+            alert("No response from the server. Please try again later.");
+        }
+    }
+};
+
+const handleClose = (value)=>{
+
+    setShowPop(!showPop);
+
+    if(value === "removingValue" ){
+        setRejectReason("")
+        setRejectedId(null);
+    }
+
+}
+
+
+
+
+const rejectedHandler = async (e) => {
+    e.preventDefault(); 
+    const token = localStorage.getItem("token");
+    try {
+        const response = await axios.put(
+            `${import.meta.env.VITE_BACKEND_API}members/update-member-status/${rejectedId}`,
+            { status: 2, reject_reason: rejectReason },
+            { headers: { Authorization: token } }
+        );
+        if (response.status === 200) {
+            fetchData(); 
+            alert("Member rejected successfully!");
+            handleClose("removingValue");
+        }
+    } catch (error) {
+        console.error("Error rejecting member:", error);
+        alert("Failed to reject member. Please try again.");
+    }
+};
+
+
+    const statusHtmlCellRender = (row)=>{
+
+        if(row?.status === 0){
+            return <>
+                    <div className=' flex  gap-2 '>
+                        <button type='button' className=' whitespace-nowrap w-[70px] h-8 bg-[#B5B5B5] text-sm  text-[#FFFFFF] rounded '>Pending</button>
+                        <button type='button' onClick={()=>{approvedHandler(row?.key)}} className=' whitespace-nowrap w-[80px] h-8 bg-[#00B656] text-sm  text-[#FFFFFF] rounded '>Apporved</button>
+                        <button onClick={()=>{ setRejectedId(row?.key); handleClose() }} type='button' className=' whitespace-nowrap w-[80px] h-8 bg-[#EA4242] text-sm  text-[#FFFFFF] rounded '>Rejected</button>
+                    </div>
+            </>
+        }
+        if(row?.status === 1){
+            return <>
+                    <div>
+                    <button type='button' className=' whitespace-nowrap text-sm font-medium '>Apporved</button>
+                    </div>
+            </>
+        }
+        if(row?.status === 2){
+            return <>
+                    <div>
+                        <button type='button' className=' whitespace-nowrap text-sm font-medium ' >Rejected</button>
+                    </div>
+            </>
+        }
+
+    } 
+
 
     const columns = [
         {
             name: 'ID',
             selector: row => row.id,
-            sortable: true
+            sortable: true,
+            minWidth:"80px",
+            maxWidth:"80px"
         },
         {
             name: ' Name',
             selector: row => row.name,
-            sortable: true
+            sortable: true,
+            minWidth:"100px",
+            maxWidth:"150px"
         },
         {
             name: 'Email',
@@ -65,18 +177,29 @@ const Members = () => {
         {
             name: 'Mobile',
             selector: row => row.mobile,
-            sortable: true
+            sortable: true,
+            minWidth:"100px",
+            maxWidth:"150px"
         },
         {
             name: 'Type',
             selector: row => row.type,
-            sortable: true
+            sortable: true,
+            minWidth:"100px",
+            maxWidth:"150px"
         },
         {
             name: 'Action',
             selector: row => row.action,
-            sortable: true
-        }
+            sortable: true,
+            minWidth:"100px",
+            maxWidth:"150px"
+        },
+        {
+            name: 'Status',
+            selector: row => row.status,
+            cell:statusHtmlCellRender,
+        },
     ];
     const tableListData = messageData?.map((message,index)=>{
         return {
@@ -86,6 +209,7 @@ const Members = () => {
             email: message?.email,
             mobile: message?.mobile,
             type: message?.member_type,
+            status:message?.status,
             action: <div className='flex gap-2'>
                 <Link className='btn btn-primary btn-sm' to={`edit-member/${message?.member_id}`}>Edit</Link>
                 <div className='btn btn-outline-danger btn-sm'  onClick={()=>{handleDeleteHandler(message?.member_id)}}>Delete</div>
@@ -209,8 +333,41 @@ const customStyles = {
                             data={ loading ? skeletonTableData : tableListData }
                             pagination
                             customStyles={customStyles}
-                        ></DataTable>
+                        />
                     </div>
+                    <Modal show={showPop} onHide={()=>{handleClose("removingValue")}}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{"Reject Reason"}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Card>
+                            <Card.Body>
+                            <Form onSubmit={rejectedHandler}>
+                                <Row>
+                                    <Col sm={12} md={12}>
+                                        <Row>
+                                            <Col sm={12} md={12}>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Reason</Form.Label>
+                                                    <Form.Control
+                                                        required
+                                                        as="textarea"
+                                                        value={rejectReason}
+                                                        onChange={(e) => setRejectReason(e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                                <Button type="submit" variant="danger">
+                                    Reject
+                                </Button>
+                            </Form>
+                            </Card.Body>
+                        </Card>
+                    </Modal.Body>
+                </Modal>
                 </div>
             </Container>
         </React.Fragment>

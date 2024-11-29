@@ -22,12 +22,23 @@ const AddMember = () => {
         state: '',
         city: '',
         address: '',
-        pincode: ''
+        pincode: '',
+        aadhaarFile :"",
+        panFile :"",
+        resumeFile:""
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleFileChange = (e) => {
+        const { name } = e.target;
+
+        const file = e.target.files[0];
+
+        setFormData({ ...formData, [name]: file });
     };
 
     const handleSubmit = async (e) => {
@@ -39,11 +50,14 @@ const AddMember = () => {
         };
         delete dataToSubmit.firstName;
         delete dataToSubmit.lastName;
+
+        const formDataObj = new FormData();
+        Object.keys(dataToSubmit).forEach(key => formDataObj.append(key, dataToSubmit[key]));
     
         const token = localStorage.getItem('token');
     
         try {
-            const response = await axios.post(import.meta.env.VITE_BACKEND_API + 'members/add-member', dataToSubmit, {
+            const response = await axios.post(import.meta.env.VITE_BACKEND_API + 'members/add-member', formDataObj, {
                 headers: { Authorization: token }
             });
     
@@ -266,6 +280,35 @@ const AddMember = () => {
                                                     value={formData.pincode}
                                                     onChange={handleChange}
                                                     required
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col sm={12} md={6}>
+                                    <h4>documents</h4>
+                                    <Row>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Aadhaar card</Form.Label>
+                                                <Form.Control type="file" name="aadhaarFile" onChange={handleFileChange}
+                                                 accept=".jpg, .jpeg, .png, .pdf" 
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Pan Card</Form.Label>
+                                                <Form.Control type="file" name="panFile" onChange={handleFileChange}
+                                                 accept=".jpg, .jpeg, .png, .pdf" 
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={12} md={6}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label>Resume</Form.Label>
+                                                <Form.Control type="file" name="resumeFile" onChange={handleFileChange}
+                                                 accept=".jpg, .jpeg, .png, .pdf" 
                                                 />
                                             </Form.Group>
                                         </Col>

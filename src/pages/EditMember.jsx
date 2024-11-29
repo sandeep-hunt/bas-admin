@@ -26,8 +26,19 @@ const EditMember = () => {
         state: '',
         city: '',
         address: '',
-        pincode: ''
+        pincode: '',
+        aadhaarFile :"",
+        panFile :"",
+        resumeFile:""
     });
+
+
+    console.log("formData",formData)
+
+    const [images,setImages]= useState(
+        {aadhaarFile :"",
+        panFile :"",
+        resumeFile:""})
     
     const [error, setError] = useState('');  // State to store error message
     
@@ -53,8 +64,15 @@ const EditMember = () => {
                         state: response.data.state,
                         city: response.data.city,
                         address: response.data.address,
-                        pincode: response.data.pincode
+                        pincode: response.data.pincode,
+                        aadhaarFile :"",
+                        panFile :"",
+                        resumeFile:""                        
                     });
+
+                    setImages({aadhaarFile :response.data.aadhaarFilePath,
+                        panFile :response.data.panFilePath,
+                        resumeFile:response.data.resumeFilePath})
                 })
                 
             .catch(error => {
@@ -68,6 +86,24 @@ const EditMember = () => {
         setFormData({ ...formData, [name]: value });
     };
 
+    const handleFileChange = (e) => {
+        const { name } = e.target;
+
+        const file = e.target.files[0];
+
+        setFormData({ ...formData, [name]: file });
+        if(name === "aadhaarFile"){
+            setImages({...images,[name]:""})
+        }
+        if(name === "panFile"){
+            setImages({...images,[name]:""})
+        }
+        if(name === "resumeFile"){
+            setImages({...images,[name]:""})
+        }
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const fullName = formData.firstName + ' ' + formData.lastName;
@@ -77,11 +113,14 @@ const EditMember = () => {
         };
         delete dataToSubmit.firstName;
         delete dataToSubmit.lastName;
+
+        const formDataObj = new FormData();
+        Object.keys(dataToSubmit).forEach(key => formDataObj.append(key, dataToSubmit[key]));
     
         const token = localStorage.getItem('token');
     
         try {
-            const response = await axios.put(import.meta.env.VITE_BACKEND_API + `members//update-member/${member_id}`, dataToSubmit, {
+            const response = await axios.put(import.meta.env.VITE_BACKEND_API + `members/update-member/${member_id}`, formDataObj, {
                 headers: { Authorization: token }
             });
     
@@ -299,6 +338,101 @@ const EditMember = () => {
                                                 />
                                             </Form.Group>
                                         </Col>
+                                    </Row>
+                                </Col>
+                                <Col sm={12} md={6}>
+                                    <h4>documents</h4>
+                                    <Row>
+                                    <Col sm={12}>
+                                        <div className="mb-3">
+                                            <Form.Label>Aadhaar Card</Form.Label>
+                                            <div className=' flex items-center  gap-4'>
+                                                {images.aadhaarFile && (
+                                                    true ? (
+                                                        <a
+                                                            href={`${import.meta.env.VITE_BACKEND_API}${images.aadhaarFile}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className='bg-orange-400 p-2 h-10 border rounded cursor-pointer text-sm text-[#FFFFFF] font-semibold'
+                                                        >
+                                                            View Aadhaar
+                                                        </a>
+                                                    ) : (
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BACKEND_API}${formData.aadhaarFile}`}
+                                                            alt="Aadhaar"
+                                                            style={{ maxWidth: '100%', maxHeight: '200px' }}
+                                                        />
+                                                    )
+                                                )}
+                                                <div >
+                                                    <Form.Group className=" ">
+                                                    <Form.Control type="file" name="aadhaarFile" onChange={handleFileChange}
+                                                    accept=".jpg, .jpeg, .png, .pdf" 
+                                                    />
+                                                </Form.Group>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </Col>
+                                    <Col sm={12}>
+                                        <div className="mb-3">
+                                            <Form.Label>PAN Card</Form.Label>
+                                            <div className='flex  gap-12'>
+                                                {images.panFile && (
+                                                    true ? (
+                                                        <a
+                                                            href={`${import.meta.env.VITE_BACKEND_API}${images.panFile}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className='bg-orange-400 p-2 border rounded cursor-pointer text-sm text-[#FFFFFF] font-semibold'
+                                                        >
+                                                            View PAN
+                                                        </a>
+                                                    ) : (
+                                                        <img
+                                                            src={`${import.meta.env.VITE_BACKEND_API}${formData.panFile}`}
+                                                            alt="PAN"
+                                                            style={{ maxWidth: '100%', maxHeight: '200px' }}
+                                                        />
+                                                    )
+                                                )}
+                                                <div >
+                                                    <Form.Group className=" ">
+                                                    <Form.Control type="file" name="panFile" onChange={handleFileChange}
+                                                    accept=".jpg, .jpeg, .png, .pdf" 
+                                                    />
+                                                </Form.Group>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+
+                                    <Col sm={12}>
+                                        <div className="mb-3">
+                                        <Form.Label>Resume</Form.Label>
+                                        <div className=' flex gap-4'>
+                                            {images.resumeFile && (
+                                            <a
+                                                href={`${import.meta.env.VITE_BACKEND_API}${images.resumeFile}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className=' bg-orange-400 p-2 border rounded cursor-pointer text-sm text-[#FFFFFF] font-semibold'
+                                            >
+                                                View Resume
+                                            </a>
+                                            )}
+                                            <div >
+                                                    <Form.Group className=" ">
+                                                    <Form.Control type="file" name="resumeFile" onChange={handleFileChange}
+                                                    accept=".jpg, .jpeg, .png, .pdf" 
+                                                    />
+                                                </Form.Group>
+                                                </div>
+                                        </div>
+                                        </div>
+                                    </Col>
                                     </Row>
                                 </Col>
                                 <Col sm={12}>

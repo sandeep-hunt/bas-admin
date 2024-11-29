@@ -37,6 +37,91 @@ const EventBooking = () => {
     },[])
 
 
+
+    const refundHandler = async (row) => {
+        const dataToSubmit = {
+            payment_id: row?.payment_id,
+            bookingId: row?.key,
+            email: row?.email,
+        };
+    
+        const token = localStorage.getItem('token');
+    
+        if (!token) {
+            alert("Authentication token is missing. Please log in again.");
+            return;
+        }
+    
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BACKEND_API}payment/refund`,
+                dataToSubmit,
+                {
+                    headers: { Authorization: token } 
+                }
+            );
+    
+            console.log("Refund Response:", response?.data);
+    
+            // Show success message
+            if (response?.data?.message) {
+                alert(response.data.message);
+            } else {
+                alert("Refund processed successfully.");
+            }
+        } catch (error) {
+            if (error.response) {
+                // Backend responded with an error
+                console.error("Backend Error Response:", error.response.data);
+    
+                // Display the error message from the backend
+                const errorMessage = error.response.data.message || "An error occurred while processing your request.";
+                alert(errorMessage);
+            } else if (error.request) {
+                // Request was made but no response was received
+                console.error("No Response Error:", error.request);
+                alert("No response from the server. Please try again later.");
+            } else {
+                // Something else caused the error
+                console.error("Error Message:", error.message);
+                alert("An unexpected error occurred. Please try again.");
+            }
+        }
+        getDataHandler();
+    };
+    
+
+    const statusHtmlCellRender = (row) => {
+
+        return <>
+        
+            <div>
+                {
+                    row.status?.toLowerCase() === "paid"  && <div className=' flex items-center  gap-4'>  
+                            <div>paid</div>
+                            <div onClick={(e)=>{refundHandler(row)}} className=' bg-red-500 w-[70px] h-8 flex justify-center items-center p-1 rounded text-sm cursor-pointer font-semibold text-[#FFFFFF] '>Refund</div>
+                         </div>
+                }
+                {
+                    row.status?.toLowerCase() === "failed"  && <div>  
+                            <div>failed</div>
+                         </div>
+                }
+                {
+                    row.status?.toLowerCase() === "refunded"  && <div>  
+                            <div>refunded</div>
+                         </div>
+                }
+                {
+                    row.status?.toLowerCase() === ""  && <div>  
+                            <div>{row.status}</div>
+                         </div>
+                }
+            </div>
+        </>
+    }
+
+
     const columns = [
         {
             name: 'Booking ID',
@@ -66,6 +151,7 @@ const EventBooking = () => {
         {
             name: 'Payment Status',
             selector: row => row.status,
+            cell:statusHtmlCellRender,
             sortable: true
         },
         // {
@@ -95,6 +181,8 @@ const EventBooking = () => {
             mobile: val?.event_booking_contact,
             date: formattedDate,
             status: val?.payment_status,
+            payment_id:val?.payment_id,
+
             // action: <>
             //     <Link className='btn btn-primary btn-sm' to="/">Edit</Link>
             //     <Link className='btn btn-outline-danger btn-sm' to="/">Delete</Link>

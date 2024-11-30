@@ -10,6 +10,7 @@ import axios from 'axios'
 import Modal from 'react-bootstrap/Modal';
 import { Card, Col, Form, Row } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
+import { Helmet } from 'react-helmet'
 
 const Members = () => {
 
@@ -312,6 +313,9 @@ const customStyles = {
 };
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Members List</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

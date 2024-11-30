@@ -3,19 +3,14 @@ import Header from '../components/Header';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Container from 'react-bootstrap/esm/Container';
 import DataTable from 'react-data-table-component';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
 import Modal from 'react-bootstrap/Modal';
 import { Card, Col, Form, Row } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
-
-
-
+import { Helmet } from 'react-helmet';
 
 const Donation = () => {
-
 
     const [loading, setLoading] = useState(true);  // Loading state
     const [donationData, setDonationData] = useState([]);
@@ -72,7 +67,6 @@ const Donation = () => {
         </>
     }
 
-
     const columns = [
         {
             name: 'Sno',
@@ -125,10 +119,6 @@ const Donation = () => {
         },
     ];
 
-
-
-
-
     const fetchData = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -152,15 +142,10 @@ const Donation = () => {
         }
     };
 
-
     useEffect(() => {
         window.scrollTo(0, 0);
-
-
         fetchData();
     }, []);
-
-
 
     // Custom styles for the table
     const customStyles = {
@@ -216,11 +201,11 @@ const Donation = () => {
         }
     }
 
-
-
-
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Donations</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

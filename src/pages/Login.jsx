@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const Login = () => {
     const token = localStorage.getItem('token'); // Check if token exists
@@ -73,6 +74,9 @@ const Login = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Login</title>
+            </Helmet>
             <section style={{ height: `100vh` }}>
                 <div className="container h-100">
                     <div className="row justify-content-center align-items-center h-100">

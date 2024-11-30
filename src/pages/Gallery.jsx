@@ -11,6 +11,7 @@ import { Form } from 'react-bootstrap';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';  // Skeleton loading
 import 'react-loading-skeleton/dist/skeleton.css';  // Skeleton styles
+import { Helmet } from 'react-helmet';
 
 
 const Gallery = () => {
@@ -173,6 +174,9 @@ const Gallery = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Gallery</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

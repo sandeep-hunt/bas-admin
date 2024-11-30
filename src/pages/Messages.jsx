@@ -6,6 +6,7 @@ import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  
+import { Helmet } from 'react-helmet';
 
 export default function Messages() {
     const [loading, setLoading] = useState(true);  
@@ -188,6 +189,9 @@ export default function Messages() {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Messages</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

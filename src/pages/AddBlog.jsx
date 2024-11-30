@@ -7,51 +7,53 @@ import { Button } from 'react-bootstrap';
 import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const AddBlog = ({ username }) => { // Accept username as a prop
     const navigator = useNavigate();
-    const [blog, setBlog] = useState({ blog_title: '', blog_shortDesc: '', blog_content: '', blog_author: username || '', blog_slug: '', blog_page_title: '', blog_page_keywords: '', blog_page_desc: '',blog_category:null });
+    const [blog, setBlog] = useState({ blog_title: '', blog_shortDesc: '', blog_content: '', blog_author: username || '', blog_slug: '', blog_page_title: '', blog_page_keywords: '', blog_page_desc: '', blog_category: null });
     const [selectedFiles, setSelectedFiles] = useState({ image1: null, image2: null });
     const [previews, setPreviews] = useState({ image1: '', image2: '' });
     const [error, setError] = useState('');
-    const[categoryData,setCategoryData]=useState([]);
+    const [categoryData, setCategoryData] = useState([]);
 
     const fetchData = async () => {
         try {
-              const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token');
 
-          axios.get(import.meta.env.VITE_BACKEND_API + 'category', {
-                    headers: { Authorization: token }
-                })
+            axios.get(import.meta.env.VITE_BACKEND_API + 'category', {
+                headers: { Authorization: token }
+            })
                 .then(response => {
-                               if( response?.data?.length !== 0 ){
-                                setCategoryData(response?.data);
-                                // setLoading(false);
-                               }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching Category:', error);
-                                setCategoryData([])
-                                // setLoading(false);  // In case of an error, also stop loading
-                            });
+                    if (response?.data?.length !== 0) {
+                        setCategoryData(response?.data);
+                        // setLoading(false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching Category:', error);
+                    setCategoryData([])
+                    // setLoading(false);  // In case of an error, also stop loading
+                });
 
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    
+    useEffect(() => {
+        window.scrollTo(0, 0);
 
-    fetchData();
-}, []);
 
-const options = categoryData?.map((val, i) => {
-    return (
-      <option value={val?.category_id} key={i}>
-        {val?.category_name}
-      </option>
-    )});
+        fetchData();
+    }, []);
+
+    const options = categoryData?.map((val, i) => {
+        return (
+            <option value={val?.category_id} key={i}>
+                {val?.category_name}
+            </option>
+        )
+    });
 
     // Function to generate slug from title
     const generateSlug = (title) => {
@@ -96,7 +98,7 @@ const options = categoryData?.map((val, i) => {
         formData.append('blog_page_keywords', blog.blog_page_keywords);
         formData.append('blog_page_desc', blog.blog_page_desc);
         formData.append('blog_category', blog.blog_category);
-        
+
 
         if (selectedFiles.image1) {
             formData.append('image1', selectedFiles.image1);
@@ -107,7 +109,7 @@ const options = categoryData?.map((val, i) => {
         const token = localStorage.getItem('token');
 
         axios.post(`${import.meta.env.VITE_BACKEND_API}blogs/add`, formData, {
-            headers: {  Authorization: token  }
+            headers: { Authorization: token }
         })
             .then(response => {
                 alert('Blog added successfully');
@@ -119,10 +121,13 @@ const options = categoryData?.map((val, i) => {
             });
     };
 
- 
+
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Add Blogs</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">
@@ -182,7 +187,7 @@ const options = categoryData?.map((val, i) => {
                                         <Form.Control
                                             as="select"
                                             name="blog_category"
-                                            value={blog.category} 
+                                            value={blog.category}
                                             onChange={handleChange}
                                             required
                                         >
@@ -199,7 +204,7 @@ const options = categoryData?.map((val, i) => {
                                             init={{
                                                 plugins: [
                                                     'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                                                    
+
                                                 ],
                                                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                                             }}

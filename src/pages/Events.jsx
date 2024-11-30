@@ -11,6 +11,7 @@ import { Form } from 'react-bootstrap';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { Helmet } from 'react-helmet';
 
 const Events = () => {
     const [show, setShow] = useState(false);
@@ -169,6 +170,9 @@ const Events = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Events List</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">
@@ -340,6 +344,7 @@ const Events = () => {
                                             required
                                         />
                                     </Form.Group>
+                                    {formData.event_date}
                                 </Col>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
@@ -352,6 +357,7 @@ const Events = () => {
                                             required
                                         />
                                     </Form.Group>
+                                    {formData.event_time}
                                 </Col>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">

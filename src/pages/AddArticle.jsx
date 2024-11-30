@@ -6,6 +6,7 @@ import { Col, Form, Row, Card, Accordion } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
+import { Helmet } from "react-helmet";
 
 const AddArticle = ({ username, id }) => { // Accept username as a prop
     const [article, setarticle] = useState({ article_title: '', article_shortDesc: '', article_content: '', article_author: username || '', article_slug: '', article_page_title: '', article_page_keywords: '', article_page_desc: '' });
@@ -87,6 +88,9 @@ const AddArticle = ({ username, id }) => { // Accept username as a prop
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Add Articles</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">
@@ -146,7 +150,7 @@ const AddArticle = ({ username, id }) => { // Accept username as a prop
                                             init={{
                                                 plugins: [
                                                     'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                                                    
+
                                                 ],
                                                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                                             }}
@@ -160,7 +164,7 @@ const AddArticle = ({ username, id }) => { // Accept username as a prop
                                     {/* PDF Upload Input for Multiple Files */}
                                     <Form.Group className='mb-3'>
                                         <Form.Label>Author <span style={{ color: 'red' }}>*</span></Form.Label>
-                                        <Form.Control type="file" name="pdfs" accept="application/pdf" multiple onChange={handleFileChange} required/>
+                                        <Form.Control type="file" name="pdfs" accept="application/pdf" multiple onChange={handleFileChange} required />
                                         {previews.pdfs.length > 0 && (
                                             <div>
                                                 <p className='mt-3'>Selected PDFs:</p>

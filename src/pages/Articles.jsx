@@ -8,6 +8,7 @@ import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
 import { Spinner } from 'react-bootstrap';  // Import Bootstrap Spinner
+import { Helmet } from 'react-helmet';
 
 const Articles = () => {
     const columns = [
@@ -34,7 +35,7 @@ const Articles = () => {
         },
         {
             name: 'Short Description',
-            selector: row => row.article_shortDesc.split(' ').slice(0, 11).join(' ')+'....',
+            selector: row => row.article_shortDesc.split(' ').slice(0, 11).join(' ') + '....',
             sortable: true,
             wrap: true,
         },
@@ -170,6 +171,9 @@ const Articles = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Articles List</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

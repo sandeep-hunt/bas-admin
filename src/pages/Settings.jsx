@@ -5,12 +5,16 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import ProfileEdit from '../components/ProfileEdit';
 import ChangePassword from '../components/ChangePassword';
 import SiteSetting from '../components/SiteSetting';
+import { Helmet } from 'react-helmet';
 
 export default function Settings() {
     const [displayBlock, setDisplayBlock] = useState("profileEdit");
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Settings</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

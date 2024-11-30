@@ -3,28 +3,27 @@ import Header from '../components/Header'
 import Breadcrumbs from '../components/Breadcrumbs'
 import Container from 'react-bootstrap/esm/Container'
 import DataTable from 'react-data-table-component'
-import { Link } from 'react-router-dom'
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css'; 
+import 'react-loading-skeleton/dist/skeleton.css';
 import axios from 'axios'
+import { Helmet } from 'react-helmet'
 
 const EventBooking = () => {
 
-    const [eventBookingData,setEventBookingData] = useState([]);
+    const [eventBookingData, setEventBookingData] = useState([]);
     const [loading, setLoading] = useState(true);  // Loading state
+    const [isRefunding, setIsRefunding] = useState(false);  // Global loading state for all buttons
+    const [loadingRefundRow, setLoadingRefundRow] = useState(null);  // Track the row being refunded
 
 
-
-
-
-    const  getDataHandler = async ()=>{
+    const getDataHandler = async () => {
 
         const token = localStorage.getItem('token');
         try {
-            const get_response = await  axios.get(import.meta.env.VITE_BACKEND_API + 'eventsBooking',{
+            const get_response = await axios.get(import.meta.env.VITE_BACKEND_API + 'eventsBooking', {
                 headers: { Authorization: token }
             });
-            if(get_response?.data){
+            if (get_response?.data) {
                 setEventBookingData(get_response?.data);
                 setLoading(false);
             }
@@ -34,14 +33,10 @@ const EventBooking = () => {
         }
     }
 
-
-    useEffect(()=>{
-
+    useEffect(() => {
         getDataHandler();
 
-    },[])
-
-
+    }, [])
 
     const refundHandler = async (row) => {
         const dataToSubmit = {
@@ -49,23 +44,27 @@ const EventBooking = () => {
             bookingId: row?.key,
             email: row?.email,
         };
-    
+
         const token = localStorage.getItem('token');
-    
+
         if (!token) {
             alert("Authentication token is missing. Please log in again.");
             return;
         }
-    
+
+        // Disable all buttons and show spinner for the specific row
+        setIsRefunding(true);
+        setLoadingRefundRow(row.key);
+
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_BACKEND_API}payment/refund`,
                 dataToSubmit,
                 {
-                    headers: { Authorization: token } 
+                    headers: { Authorization: token }
                 }
             );
-    
+
             // Show success message
             if (response?.data?.message) {
                 alert(response.data.message);
@@ -74,56 +73,50 @@ const EventBooking = () => {
             }
         } catch (error) {
             if (error.response) {
-                // Backend responded with an error
-                console.error("Backend Error Response:", error.response.data);
-    
-                // Display the error message from the backend
                 const errorMessage = error.response.data.message || "An error occurred while processing your request.";
                 alert(errorMessage);
-            } else if (error.request) {
-                // Request was made but no response was received
-                console.error("No Response Error:", error.request);
-                alert("No response from the server. Please try again later.");
             } else {
-                // Something else caused the error
-                console.error("Error Message:", error.message);
                 alert("An unexpected error occurred. Please try again.");
             }
+        } finally {
+            // Re-enable all buttons and remove the loading spinner for the specific row
+            setIsRefunding(false);
+            setLoadingRefundRow(null);
         }
-        getDataHandler();
+
+        getDataHandler(); // Refresh data
     };
-    
 
     const statusHtmlCellRender = (row) => {
-
-        return <>
-        
-            <div>
-                {
-                    row.status?.toLowerCase() === "paid"  && <div className=' flex items-center  gap-4'>  
+        return (
+            <>
+                <div>
+                    {row.status?.toLowerCase() === "paid" && (
+                        <div className='flex items-center gap-4'>
                             <div>paid</div>
-                            <div onClick={(e)=>{refundHandler(row)}} className=' bg-red-500 w-[70px] h-8 flex justify-center items-center p-1 rounded text-sm cursor-pointer font-semibold text-[#FFFFFF] '>Refund</div>
-                         </div>
-                }
-                {
-                    row.status?.toLowerCase() === "failed"  && <div>  
-                            <div>failed</div>
-                         </div>
-                }
-                {
-                    row.status?.toLowerCase() === "refunded"  && <div>  
-                            <div>refunded</div>
-                         </div>
-                }
-                {
-                    row.status?.toLowerCase() === ""  && <div>  
-                            <div>{row.status}</div>
-                         </div>
-                }
-            </div>
-        </>
-    }
-
+                            <div
+                                onClick={(e) => { refundHandler(row) }}
+                                className={`${isRefunding ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 cursor-pointer'
+                                    } w-[70px] h-8 flex justify-center items-center p-1 rounded text-sm font-semibold text-[#FFFFFF]`}
+                                disabled={isRefunding}
+                            >
+                                {loadingRefundRow === row.key ? (
+                                    <div className="spinner-border text-white" style={{ width: '1rem', height: '1rem' }} role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                ) : (
+                                    'Refund'
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    {row.status?.toLowerCase() === "failed" && <div>failed</div>}
+                    {row.status?.toLowerCase() === "refunded" && <div>refunded</div>}
+                    {row.status?.toLowerCase() === "" && <div>{row.status}</div>}
+                </div>
+            </>
+        );
+    };
 
     const columns = [
         {
@@ -147,6 +140,16 @@ const EventBooking = () => {
             sortable: true
         },
         {
+            name: 'Payment ID',
+            selector: row => row.payment_id,
+            sortable: false
+        },
+        {
+            name: 'Payment Refund ID',
+            selector: row => row.payment_refund_id,
+            sortable: false
+        },
+        {
             name: 'Date',
             selector: row => row.date,
             sortable: true
@@ -154,19 +157,14 @@ const EventBooking = () => {
         {
             name: 'Payment Status',
             selector: row => row.status,
-            cell:statusHtmlCellRender,
+            cell: statusHtmlCellRender,
             sortable: true
         },
-        // {
-        //     name: 'Action',
-        //     selector: row => row.action,
-        //     sortable: true
-        // }
     ];
-    const data = eventBookingData?.map((val,i) => {
+    const data = eventBookingData?.map((val, i) => {
         // Ensure event_booking_dob is a valid Date object
         const date = new Date(val?.event_booking_dob);
-        
+
         // Check if the date is valid
         const formattedDate = date instanceof Date && !isNaN(date)
             ? new Intl.DateTimeFormat('en-US', {
@@ -175,76 +173,75 @@ const EventBooking = () => {
                 year: 'numeric'
             }).format(date)
             : ''; // Return empty string if the date is invalid
-    
+
         return {
-            key:val?.event_booking_id,
-            id: i+1,
+            key: val?.event_booking_id,
+            id: i + 1,
             name: val?.event_name,
             email: val?.event_booking_email,
             mobile: val?.event_booking_contact,
             date: formattedDate,
             status: val?.payment_status,
-            payment_id:val?.payment_id,
-
-            // action: <>
-            //     <Link className='btn btn-primary btn-sm' to="/">Edit</Link>
-            //     <Link className='btn btn-outline-danger btn-sm' to="/">Delete</Link>
-            // </>
+            payment_id: val?.payment_id,
         }
     });
-    
 
-   
     // Custom styles for the table
-const customStyles = {
-    headCells: {
-      style: {
-        fontSize: '14px',
-        fontWeight: 'bold'
-      },
-    },
-    cells: {
-      style: {
-        fontSize: '14px',
-      },
-    },
-  };
+    const customStyles = {
+        headCells: {
+            style: {
+                fontSize: '14px',
+                fontWeight: 'bold'
+            },
+        },
+        cells: {
+            style: {
+                fontSize: '14px',
+            },
+        },
+    };
 
-   // Skeleton columns for loading
-   const skeletonColumns = [
-    {
-        name: <Skeleton width={50} />,
-        selector: () => <Skeleton width={50} />,
-    },
-    {
-        name: <Skeleton width={150} />,
-        selector: () => <Skeleton width={150} />,
-    },
-    {
-        name: <Skeleton width={100} />,
-        selector: () => <Skeleton width={100} />,
-    },
-    {
-        name: <Skeleton width={100} />,
-        selector: () => <Skeleton width={100} />,
-    },
-    {
-        name: <Skeleton width={100} />,
-        selector: () => <Skeleton width={100} />,
-    },
-    {
-        name: <Skeleton width={100} />,
-        selector: () => <Skeleton width={100} />,
-    },
-    {
-        name: <Skeleton width={100} />,
-        cell: () => <Skeleton width={100} height={30} />,
-    },
-];
-
+    // Skeleton columns for loading
+    const skeletonColumns = [
+        {
+            name: <Skeleton width={50} />,
+            selector: () => <Skeleton width={50} />,
+        },
+        {
+            name: <Skeleton width={150} />,
+            selector: () => <Skeleton width={150} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            selector: () => <Skeleton width={100} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            selector: () => <Skeleton width={100} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            selector: () => <Skeleton width={100} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            selector: () => <Skeleton width={100} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            selector: () => <Skeleton width={100} />,
+        },
+        {
+            name: <Skeleton width={100} />,
+            cell: () => <Skeleton width={100} height={30} />,
+        },
+    ];
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Event Booking</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">
@@ -257,10 +254,6 @@ const customStyles = {
                         </div>
                     </div>
                     <div className="mt-3">
-                        {/* <div className="d-flex justify-content-end mb-3">
-                            <Link className='btn btn-primary' to="/events/add-booking">Add Booking</Link>
-                            <input type="text" onChange={handleFilter} />
-                        </div> */}
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
                             data={loading ? Array(5).fill({}) : data}

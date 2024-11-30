@@ -10,6 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
+import { Helmet } from 'react-helmet';
 
 const Blogs = () => {
     const [show, setShow] = useState(false);
@@ -239,6 +240,9 @@ const Blogs = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Categories List</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

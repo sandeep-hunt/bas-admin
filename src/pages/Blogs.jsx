@@ -8,6 +8,7 @@ import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
 import { Spinner } from 'react-bootstrap'; // Import Bootstrap Spinner
+import { Helmet } from 'react-helmet';
 
 const Blogs = () => {
     const [records, setRecords] = useState([]);
@@ -180,6 +181,9 @@ const Blogs = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Blogs List</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap'
 import { Editor } from "@tinymce/tinymce-react";
 import { useParams } from 'react-router-dom';
 import axios from 'axios'
+import { Helmet } from 'react-helmet'
 
 const EditArticle = () => {
     const { Articleid } = useParams();
@@ -92,6 +93,9 @@ const EditArticle = () => {
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Edit Article</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">

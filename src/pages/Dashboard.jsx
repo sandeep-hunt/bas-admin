@@ -4,6 +4,7 @@ import axios from "axios";
 import { Link } from 'react-router-dom';
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { Helmet } from 'react-helmet';
 
 const Dashboard = () => {
 
@@ -100,6 +101,9 @@ const Dashboard = () => {
 
   return (
     <React.Fragment>
+    <Helmet>
+        <title>Dashboard</title>
+    </Helmet>
       <div className="w-full">
         <div>
           <Header />

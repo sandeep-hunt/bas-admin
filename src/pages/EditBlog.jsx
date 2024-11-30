@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap'
 import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios'
+import { Helmet } from 'react-helmet'
 
 const EditBlog = () => {
     const navigator = useNavigate();
@@ -15,12 +16,12 @@ const EditBlog = () => {
     const [error, setError] = useState('');
     const [selectedFiles, setSelectedFiles] = useState({ image1: null, image2: null });  // Store the selected image
     const [previews, setPreviews] = useState({ image1: '', image2: '' });  // Preview for the selected image
-    const[categoryData,setCategoryData]=useState([]);
+    const [categoryData, setCategoryData] = useState([]);
 
     // Fetch the blog data from the backend using the title
     useEffect(() => {
         const token = localStorage.getItem('token');
-        axios.get(`${import.meta.env.VITE_BACKEND_API}blogs/${Blogid}`,{
+        axios.get(`${import.meta.env.VITE_BACKEND_API}blogs/${Blogid}`, {
             headers: { Authorization: token }
         })
             .then(response => {
@@ -34,20 +35,20 @@ const EditBlog = () => {
                 console.error('Error fetching the blog:', error);
                 setError('Failed to fetch blog');
             });
-            axios.get(import.meta.env.VITE_BACKEND_API + 'category', {
-                headers: { Authorization: token }
-            })
+        axios.get(import.meta.env.VITE_BACKEND_API + 'category', {
+            headers: { Authorization: token }
+        })
             .then(response => {
-                           if( response?.data?.length !== 0 ){
-                            setCategoryData(response?.data);
-                            // setLoading(false);
-                           }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching Category:', error);
-                            setCategoryData([])
-                            // setLoading(false);  // In case of an error, also stop loading
-                        });
+                if (response?.data?.length !== 0) {
+                    setCategoryData(response?.data);
+                    // setLoading(false);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching Category:', error);
+                setCategoryData([])
+                // setLoading(false);  // In case of an error, also stop loading
+            });
     }, [Blogid]);
 
     const handleContentChange = (blog_content) => {
@@ -92,8 +93,8 @@ const EditBlog = () => {
         const token = localStorage.getItem('token');
 
         axios.put(`${import.meta.env.VITE_BACKEND_API}blogs/update/${Blogid}`, formData, {
-            headers: {  Authorization: token  }
-          })
+            headers: { Authorization: token }
+        })
             .then(() => {
                 alert('Blog updated successfully');
                 navigator(`/blogs`)
@@ -105,13 +106,17 @@ const EditBlog = () => {
     };
     const options = categoryData?.map((val, i) => {
         return (
-          <option value={val?.category_id} key={i}>
-            {val?.category_name}
-          </option>
-        )});
+            <option value={val?.category_id} key={i}>
+                {val?.category_name}
+            </option>
+        )
+    });
 
     return (
         <React.Fragment>
+            <Helmet>
+                <title>Edit Blog</title>
+            </Helmet>
             <Header />
             <Container>
                 <div className="wrapper">
@@ -128,25 +133,25 @@ const EditBlog = () => {
                             <Row>
                                 <Col sm={12} md={8}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Title <span style={{color: 'red'}}>*</span></Form.Label>
-                                        <Form.Control 
-                                            type="text" 
-                                            name='blog_title' 
-                                            placeholder="Title" 
-                                            value={blog.blog_title} 
-                                            onChange={handleChange} 
-                                            required 
+                                        <Form.Label>Title <span style={{ color: 'red' }}>*</span></Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name='blog_title'
+                                            placeholder="Title"
+                                            value={blog.blog_title}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Short Description <span style={{color: 'red'}}>*</span></Form.Label>
-                                        <Form.Control 
-                                            type="text" 
-                                            name='blog_shortDesc' 
-                                            placeholder="Short Description" 
-                                            value={blog.blog_shortDesc} 
-                                            onChange={handleChange} 
-                                            required 
+                                        <Form.Label>Short Description <span style={{ color: 'red' }}>*</span></Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name='blog_shortDesc'
+                                            placeholder="Short Description"
+                                            value={blog.blog_shortDesc}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </Form.Group>
                                     <Form.Group className="mb-3">
@@ -156,7 +161,7 @@ const EditBlog = () => {
                                         <Form.Control
                                             as="select"
                                             name="blog_category"
-                                            value={blog.blog_category} 
+                                            value={blog.blog_category}
                                             onChange={handleChange}
                                             required
                                         >
@@ -165,7 +170,7 @@ const EditBlog = () => {
                                         </Form.Control>
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Content <span style={{color: 'red'}}>*</span></Form.Label>
+                                        <Form.Label>Content <span style={{ color: 'red' }}>*</span></Form.Label>
                                         <Editor
                                             apiKey={import.meta.env.VITE_TINYMCE_API}
                                             init={{
@@ -174,7 +179,7 @@ const EditBlog = () => {
                                                     'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
                                                     // Your account includes a free trial of TinyMCE premium features
                                                     // Try the most popular premium features until Oct 18, 2024:
-                                                    
+
                                                 ],
                                                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                                             }}
@@ -188,14 +193,14 @@ const EditBlog = () => {
                                         <Card>
                                             <Card.Header>Slug</Card.Header>
                                             <Card.Body>
-                                                <Form.Label>Slug <span style={{color: 'red'}}>*</span></Form.Label>
-                                                <Form.Control 
-                                                    type="text" 
-                                                    name='blog_slug' 
-                                                    placeholder="Slug" 
-                                                    value={blog.blog_slug} 
-                                                    onChange={handleChange} 
-                                                    required 
+                                                <Form.Label>Slug <span style={{ color: 'red' }}>*</span></Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name='blog_slug'
+                                                    placeholder="Slug"
+                                                    value={blog.blog_slug}
+                                                    onChange={handleChange}
+                                                    required
                                                 />
                                             </Card.Body>
                                         </Card>
@@ -205,11 +210,11 @@ const EditBlog = () => {
                                             <Card.Header>Author</Card.Header>
                                             <Card.Body>
                                                 <Form.Label>Author</Form.Label>
-                                                <Form.Control 
-                                                    type="text" 
-                                                    placeholder="Author" 
-                                                    value={blog.author} 
-                                                    disabled 
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Author"
+                                                    value={blog.author}
+                                                    disabled
                                                 />
                                             </Card.Body>
                                         </Card>
@@ -221,36 +226,36 @@ const EditBlog = () => {
                                             <Accordion.Header>SEO</Accordion.Header>
                                             <Accordion.Body>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Page Title <span style={{color: 'red'}}>*</span></Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name='blog_page_title' 
-                                                        placeholder="Page Title" 
-                                                        value={blog.blog_page_title} 
-                                                        onChange={handleChange} 
-                                                        required 
+                                                    <Form.Label>Page Title <span style={{ color: 'red' }}>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name='blog_page_title'
+                                                        placeholder="Page Title"
+                                                        value={blog.blog_page_title}
+                                                        onChange={handleChange}
+                                                        required
                                                     />
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Keywords <span style={{color: 'red'}}>*</span></Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name='blog_page_keywords' 
-                                                        placeholder="Page Meta Keywords" 
-                                                        value={blog.blog_page_keywords} 
-                                                        onChange={handleChange} 
-                                                        required 
+                                                    <Form.Label>Keywords <span style={{ color: 'red' }}>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name='blog_page_keywords'
+                                                        placeholder="Page Meta Keywords"
+                                                        value={blog.blog_page_keywords}
+                                                        onChange={handleChange}
+                                                        required
                                                     />
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Description <span style={{color: 'red'}}>*</span></Form.Label>
-                                                    <Form.Control 
-                                                        type="text" 
-                                                        name='blog_page_desc' 
-                                                        placeholder="Page Meta Description" 
-                                                        value={blog.blog_page_desc} 
-                                                        onChange={handleChange} 
-                                                        required 
+                                                    <Form.Label>Description <span style={{ color: 'red' }}>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name='blog_page_desc'
+                                                        placeholder="Page Meta Description"
+                                                        value={blog.blog_page_desc}
+                                                        onChange={handleChange}
+                                                        required
                                                     />
                                                 </Form.Group>
                                             </Accordion.Body>
@@ -268,11 +273,11 @@ const EditBlog = () => {
                                                 )}
                                                 <Form.Group className="mt-3 mb-3">
                                                     <Form.Label>Select Image</Form.Label>
-                                                    <Form.Control 
-                                                        type="file" 
-                                                        name="image1" 
-                                                        accept="image/*" 
-                                                        onChange={handleFileChange} 
+                                                    <Form.Control
+                                                        type="file"
+                                                        name="image1"
+                                                        accept="image/*"
+                                                        onChange={handleFileChange}
                                                     />
                                                 </Form.Group>
                                             </Accordion.Body>
@@ -290,10 +295,10 @@ const EditBlog = () => {
                                                 )}
                                                 <Form.Group className="mt-3 mb-3">
                                                     <Form.Label>Select Image</Form.Label>
-                                                    <Form.Control 
-                                                        type="file" 
-                                                        name="image2" 
-                                                        accept="image/*" 
+                                                    <Form.Control
+                                                        type="file"
+                                                        name="image2"
+                                                        accept="image/*"
                                                         onChange={handleFileChange}
                                                     />
                                                 </Form.Group>

@@ -17,7 +17,6 @@ import EditMember from './pages/EditMember';
 import Gallery from './pages/Gallery';
 import Events from './pages/Events';
 import EventBooking from './pages/EventBooking';
-import AddBooking from './pages/AddBooking';
 import Category from './pages/Category.jsx';
 import Settings from './pages/Settings.jsx';
 import Messages from './pages/Messages.jsx';
@@ -44,7 +43,6 @@ function App() {
       <Route path="/gallery" element={<Protected><Gallery /></Protected>} />
       <Route path="/events" element={<Protected><Events /></Protected>} />
       <Route path="/events/event-booking" element={<Protected><EventBooking /></Protected>} />
-      <Route path="/events/add-booking" element={<Protected><AddBooking /></Protected>} />
       <Route path="/settings" element={<Protected><Settings /></Protected>} />
       <Route path="/messages" element={<Protected><Messages /></Protected>} />
       <Route path="/donation" element={<Protected><Donation /></Protected>} />

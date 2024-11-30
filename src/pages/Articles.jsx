@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
+import { Spinner } from 'react-bootstrap';  // Import Bootstrap Spinner
 
 const Articles = () => {
     const columns = [
@@ -44,26 +45,36 @@ const Articles = () => {
         },
         {
             name: 'Action',
-            cell: row => <div>
-                <Link className='btn btn-primary btn-sm' to={"edit-article/" + row.article_id}>Edit</Link>
-                <button onClick={() => handleDelete(row.article_id)} className="btn btn-danger btn-sm">
-                    Delete
-                </button>
-            </div>,
+            cell: (row) => (
+                <div>
+                    <Link className='btn btn-primary btn-sm' to={"edit-article/" + row.article_id}>Edit</Link>
+                    <button
+                        onClick={() => handleDelete(row.article_id)}
+                        className="btn btn-danger btn-sm"
+                        disabled={deleteLoading || isDeleted[row.article_id]}>
+                        {deleteLoading || isDeleted[row.article_id] ? (
+                            <Spinner animation="border" size="sm" />
+                        ) : (
+                            "Delete"
+                        )}
+                    </button>
+                </div>
+            ),
         }
     ];
 
     const [records, setRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
     const [loading, setLoading] = useState(true);  // Loading state
+    const [deleteLoading, setDeleteLoading] = useState(false);  // Delete button loading state
+    const [isDeleted, setIsDeleted] = useState({});  // Track which rows are being deleted
 
     useEffect(() => {
-        fetcharticles();
+        fetchArticles();
     }, []);
 
-    const fetcharticles = () => {
+    const fetchArticles = () => {
         const token = localStorage.getItem('token');
-
         axios.get(import.meta.env.VITE_BACKEND_API + 'articles', {
             headers: { Authorization: token }
         })
@@ -81,16 +92,22 @@ const Articles = () => {
     // Handle the delete functionality
     const handleDelete = (articleId) => {
         if (window.confirm('Are you sure you want to delete this article?')) {
+            setDeleteLoading(true);  // Set the loading state to true when delete starts
+            setIsDeleted(prev => ({ ...prev, [articleId]: true })); // Disable the delete button for this row
+
             const token = localStorage.getItem('token');
             axios.delete(`${import.meta.env.VITE_BACKEND_API}articles/delete/${articleId}`, {
                 headers: { Authorization: token }
             })
                 .then(response => {
-                    alert('article deleted successfully');
-                    fetcharticles();
+                    alert('Article deleted successfully');
+                    fetchArticles();
                 })
                 .catch(error => {
                     console.error('Error deleting article:', error);
+                })
+                .finally(() => {
+                    setDeleteLoading(false);  // Reset the loading state after delete operation is complete
                 });
         }
     };

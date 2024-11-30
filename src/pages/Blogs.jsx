@@ -7,13 +7,12 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';  // Import styles for skeleton
+import { Spinner } from 'react-bootstrap'; // Import Bootstrap Spinner
 
 const Blogs = () => {
-   
-
     const [records, setRecords] = useState([]);
-    // const [filteredRecords, setFilteredRecords] = useState([]);
-    const [loading, setLoading] = useState(true);  // Loading state
+    const [loading, setLoading] = useState(true);
+    const [deletingRowId, setDeletingRowId] = useState(null); // Track deleting row ID
 
     useEffect(() => {
         fetchBlogs();
@@ -27,19 +26,18 @@ const Blogs = () => {
         })
             .then(response => {
                 setRecords(response.data);
-                // setFilteredRecords(response.data);  // Initialize with all records
-                setLoading(false);  // Data fetched, stop loading
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching blogs:', error);
-                setLoading(false);  // In case of an error, also stop loading
+                setLoading(false);
                 setRecords([]);
             });
-    }
+    };
 
-    // Handle the delete functionality
     const handleDelete = (blogId) => {
         if (window.confirm('Are you sure you want to delete this blog?')) {
+            setDeletingRowId(blogId); // Set the ID of the row being deleted
             const token = localStorage.getItem('token');
             axios.delete(`${import.meta.env.VITE_BACKEND_API}blogs/delete/${blogId}`, {
                 headers: { Authorization: token }
@@ -50,18 +48,12 @@ const Blogs = () => {
                 })
                 .catch(error => {
                     console.error('Error deleting blog:', error);
+                })
+                .finally(() => {
+                    setDeletingRowId(null); // Reset the deleting row ID
                 });
         }
     };
-
-    // Handle the filter functionality
-    // const handleFilter = (event) => {
-    //     const query = event.target.value.toLowerCase();
-    //     const newFilteredRecords = records.filter(row => {
-    //         return row.blog_title.toLowerCase().includes(query) || row.blog_slug.toLowerCase().includes(query);
-    //     });
-    //     setFilteredRecords(newFilteredRecords);
-    // };
 
     const columns = [
         {
@@ -104,30 +96,43 @@ const Blogs = () => {
         },
         {
             name: 'Action',
-            cell: row => <div className='gap-2 flex flex-row'>
-                <Link className='btn btn-primary btn-sm ' to={"edit-blog/" + row.key}>Edit</Link>
-                <button onClick={() => handleDelete(row.key)} className="btn btn-danger btn-sm">
-                    Delete
-                </button>
-            </div>,
-        }
+            cell: row => (
+                <div className='gap-2 flex flex-row'>
+                    <Link
+                        className={`btn btn-primary btn-sm ${deletingRowId ? 'disabled' : ''}`}
+                        to={"edit-blog/" + row.key}
+                    >
+                        Edit
+                    </Link>
+                    <button
+                        onClick={() => handleDelete(row.key)}
+                        className="btn btn-danger btn-sm"
+                        disabled={!!deletingRowId} // Disable all buttons during deletion
+                    >
+                        {deletingRowId === row.key ? (
+                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                        ) : (
+                            'Delete'
+                        )}
+                    </button>
+                </div>
+            ),
+        },
     ];
 
-    const  tablelistrowdata = records?.map((row, i) => {
+    const tablelistrowdata = records?.map((row, i) => {
         return {
-          key: row.blog_id,
-          blog_id:i+1,
-          created_at: row.created_at,
-          category_name:row.category_name,
-          blog_slug:row.blog_slug,
-          blog_title:row.blog_title,
-          blog_image:row.blog_image,
-          blog_shortDesc:row?.blog_shortDesc?.split(' ')?.slice(0, 11)?.join(' ')+'....'
-
+            key: row.blog_id,
+            blog_id: i + 1,
+            created_at: row.created_at,
+            category_name: row.category_name,
+            blog_slug: row.blog_slug,
+            blog_title: row.blog_title,
+            blog_image: row.blog_image,
+            blog_shortDesc: row?.blog_shortDesc?.split(' ')?.slice(0, 11)?.join(' ') + '....'
         };
-      });
+    });
 
-    // Custom styles for the table
     const customStyles = {
         headCells: {
             style: {
@@ -142,7 +147,6 @@ const Blogs = () => {
         },
     };
 
-    // Skeleton columns for loading
     const skeletonColumns = [
         {
             name: <Skeleton width={50} />,
@@ -190,7 +194,6 @@ const Blogs = () => {
                     <div className="mt-3">
                         <div className="d-flex justify-content-between mb-3">
                             <Link className='btn btn-primary' to="/add-blog">Add Blog</Link>
-                            {/* <input type="text" placeholder="Filter by title or slug" onChange={handleFilter} /> */}
                         </div>
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
@@ -206,6 +209,6 @@ const Blogs = () => {
             </Container>
         </React.Fragment>
     );
-}
+};
 
 export default Blogs;

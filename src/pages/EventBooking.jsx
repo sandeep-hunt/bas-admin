@@ -94,7 +94,7 @@ const EventBooking = () => {
                     {row.status?.toLowerCase() === "paid" && (
                         <div className='flex items-center gap-4'>
                             <div>paid</div>
-                            <div
+                            {row?.event_status !== 0 && <div
                                 onClick={(e) => { refundHandler(row) }}
                                 className={`${isRefunding ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 cursor-pointer'
                                     } w-[70px] h-8 flex justify-center items-center p-1 rounded text-sm font-semibold text-[#FFFFFF]`}
@@ -107,7 +107,7 @@ const EventBooking = () => {
                                 ) : (
                                     'Refund'
                                 )}
-                            </div>
+                            </div>}
                         </div>
                     )}
                     {row.status?.toLowerCase() === "failed" && <div>failed</div>}
@@ -183,6 +183,8 @@ const EventBooking = () => {
             date: formattedDate,
             status: val?.payment_status,
             payment_id: val?.payment_id,
+            event_status:val?.event_status,
+            payment_refund_id:val?.payment_refund_id
         }
     });
 

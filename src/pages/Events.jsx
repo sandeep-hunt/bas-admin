@@ -25,11 +25,10 @@ const Events = () => {
         event_date: '',
         event_time: '',
         event_location: '',
-        event_status: '1',
+        event_status: 1,
         event_booking_count:0,
     });
 
-    console.log("formData",formData)
     const [imagePreview, setImagePreview] = useState(null);
     const [thumbnailPreview, setThumbnailPreview] = useState(null); // Added thumbnail preview
     const [events, setEvents] = useState([]);
@@ -38,9 +37,13 @@ const Events = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [limit] = useState(8);
     const [currentEventId, setCurrentEventId] = useState(null);
+    const [editTempData,setEditTempData]= useState(null);
+    const [editButtonDisable,setEditButtonDisabled]= useState(true);
 
 
-    console.log("event_booking_count",events)
+    console.log("formData",formData)
+    console.log("editTempData",editTempData)
+
 
     useEffect(() => {
         fetchEvents();
@@ -64,7 +67,7 @@ const Events = () => {
     const handleClose = () => {
         setShow(false);
         setEditMode(false);
-        setFormData({ event_name: '', event_slug: '', event_image: '', event_thumbnail: '', event_price: '', event_date: '', event_time: '', event_location: '', event_status: '' });
+        setFormData({ event_name: '', event_slug: '', event_image: '', event_thumbnail: '', event_price: '', event_date: '', event_time: '', event_location: '', event_status: 1 });
         setImagePreview(null);
         setThumbnailPreview(null); // Clear thumbnail preview
     };
@@ -78,6 +81,7 @@ const Events = () => {
     };
 
     const handleFormChange = (e) => {
+        setEditButtonDisabled(false);
         const { name, value } = e.target;
         if (name === 'event_name') {
             const slug = generateSlug(value);  // Generate slug when title changes
@@ -88,6 +92,7 @@ const Events = () => {
     };
 
     const handleFileChange = (e) => {
+        setEditButtonDisabled(false);
         const file = e.target.files[0];
         setFormData({ ...formData, event_image: file });
         setImagePreview(URL.createObjectURL(file));
@@ -95,6 +100,7 @@ const Events = () => {
 
     // Handle thumbnail image change
     const handleThumbnailChange = (e) => {
+        setEditButtonDisabled(false);
         const file = e.target.files[0];
         setFormData({ ...formData, event_thumbnail: file });
         setThumbnailPreview(URL.createObjectURL(file));
@@ -108,6 +114,19 @@ const Events = () => {
 
         try {
             if (editMode) {
+                if( formData?.event_name === editTempData?.event_name &&  
+                    formData?.event_slug === editTempData?.event_slug &&
+                    formData?.event_image === editTempData?.event_image && 
+                    formData?.event_thumbnail === editTempData?.event_thumbnail &&
+                    formData?.event_price === editTempData?.event_price &&
+                    formData?.event_date  === editTempData?.event_date &&
+                    formData?.event_time  === editTempData?.event_time &&
+                    formData?.event_location  === editTempData?.event_location &&
+                    formData?.event_status === editTempData?.event_status ){
+                    alert("No new date to update.");
+                    setEditButtonDisabled(true)
+                    return false
+                }
                 await axios.put(import.meta.env.VITE_BACKEND_API + `events/update/${currentEventId}`, formDataObj);
             } else {
                 await axios.post(import.meta.env.VITE_BACKEND_API + 'events/add/', formDataObj);
@@ -132,6 +151,17 @@ const Events = () => {
             event_status: event.event_status,
             event_booking_count:event?.event_booking_count
         });
+        setEditTempData({
+            event_name: event?.event_name,
+            event_slug: event?.event_slug,
+            event_image: event?.event_image,
+            event_thumbnail: event?.event_thumbnail,
+            event_price: event?.event_price,
+            event_date:formatDate(event.event_date),
+            event_time: event?.event_time,
+            event_location: event?.event_location,
+            event_status: event?.event_status,
+        })
         setCurrentEventId(event.event_id);
         const new_imgPrev = import.meta.env.VITE_BACKEND_API + event.event_image;
         const new_thumbPrev = import.meta.env.VITE_BACKEND_API + event.event_thumbnail; // Set thumbnail preview
@@ -278,7 +308,7 @@ const Events = () => {
                                     onChange={handleFormChange}
                                     placeholder="Event Name"
                                     required
-                                    disabled={formData?.event_booking_count !== 0 && true}
+                                    disabled={editMode ?  formData?.event_booking_count !== 0 &&  true : false}
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
@@ -290,7 +320,7 @@ const Events = () => {
                                     onChange={handleFormChange}
                                     placeholder="Event Slug"
                                     required
-                                    disabled={formData?.event_booking_count !== 0 && true}
+                                    disabled={editMode ?  formData?.event_booking_count !== 0 &&  true : false}
                                 />
                             </Form.Group>
                             <Row>
@@ -298,8 +328,7 @@ const Events = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label>Event Image</Form.Label>
                                         <Form.Control type="file" name="event_image" onChange={handleFileChange}
-                                        
-                                        disabled={formData?.event_booking_count !== 0 && true}
+                                         disabled={editMode ?  formData?.event_booking_count !== 0 && true : false}
                                         />
                                         {/* Image preview */}
                                         {imagePreview && (
@@ -311,7 +340,7 @@ const Events = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label>Event Thumbnail</Form.Label>
                                         <Form.Control type="file" name="event_thumbnail" onChange={handleThumbnailChange}
-                                        disabled={formData?.event_booking_count !== 0 && true}
+                                        disabled={editMode ?  formData?.event_booking_count !== 0 && true : false}
                                         />
                                         {/* Thumbnail preview */}
                                         {thumbnailPreview && (
@@ -329,7 +358,7 @@ const Events = () => {
                                             onChange={handleFormChange}
                                             placeholder="Event Price"
                                             required
-                                            disabled={formData?.event_booking_count !== 0 && true}
+                                            disabled={editMode ?  formData?.event_booking_count !== 0 && true : false}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -344,7 +373,6 @@ const Events = () => {
                                             required
                                         />
                                     </Form.Group>
-                                    {formData.event_date}
                                 </Col>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
@@ -357,7 +385,7 @@ const Events = () => {
                                             required
                                         />
                                     </Form.Group>
-                                    {formData.event_time}
+                                    {/* {formData.event_time} */}
                                 </Col>
                                 <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
@@ -369,11 +397,11 @@ const Events = () => {
                                             onChange={handleFormChange}
                                             placeholder="Event Location"
                                             required
-                                            disabled={formData?.event_booking_count !== 0 && true}
+                                            disabled={editMode ?  formData?.event_booking_count !== 0 && true : false}
                                         />
                                     </Form.Group>
                                 </Col>
-                                <Col sm={12} md={6}>
+                                { editMode &&  <Col sm={12} md={6}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Status</Form.Label>
                                         <Form.Control
@@ -381,14 +409,16 @@ const Events = () => {
                                             name="event_status"
                                             value={formData.event_status}
                                             onChange={handleFormChange}
-                                        >
+                                        >  
                                             <option value="1">Active</option>
                                             <option value="0">Finished</option>
                                         </Form.Control>
                                     </Form.Group>
-                                </Col>
+                                </Col>}
                             </Row>
-                            <Button type="submit" variant="primary">
+                            <Button type="submit" variant="primary"
+                                disabled={editMode ? editButtonDisable : false}
+                            >
                                 {editMode ? 'Update Event' : 'Add Event'}
                             </Button>
                         </Form>

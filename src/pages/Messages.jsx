@@ -1,41 +1,41 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Breadcrumbs from '../components/Breadcrumbs';
 import Container from 'react-bootstrap/esm/Container';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';  
+import 'react-loading-skeleton/dist/skeleton.css';
 import { Helmet } from 'react-helmet';
 
 export default function Messages() {
-    const [loading, setLoading] = useState(true);  
+    const [loading, setLoading] = useState(true);
     const [messageData, setMessageData] = useState([]);
 
-    
+
     const editHandler = async (id, newStatus) => {
-        
-        if(newStatus === ''){
+
+        if (newStatus === '') {
             alert('need to select the value');
             return false
         }
-    
-        const updatedMessages = messageData.map(message => 
+
+        const updatedMessages = messageData.map(message =>
             message.message_id === id ? { ...message, message_status: newStatus } : message
         );
         setMessageData(updatedMessages);
 
-        
+
         const token = localStorage.getItem('token');
         try {
-          const response =  await axios.put(import.meta.env.VITE_BACKEND_API + `messages/update-message/${id}`, 
-                { message_status: newStatus }, 
+            const response = await axios.put(import.meta.env.VITE_BACKEND_API + `messages/update-message/${id}`,
+                { message_status: newStatus },
                 { headers: { Authorization: token } }
             );
             alert(response?.data?.message);
         } catch (error) {
             alert(`Error: ${error.response.data.error || 'An unexpected error occurred.'}`);
-            
+
         }
     };
 
@@ -63,7 +63,7 @@ export default function Messages() {
             message: message?.message,
             status: (
                 <select
-                 className=' bg-[#FFFFFF] border border-gray-400 p-1 rounded  '
+                    className=' bg-[#FFFFFF] border border-gray-400 p-1 rounded  '
                     value={message?.message_status}
                     onChange={(e) => editHandler(message?.message_id, e.target.value)}
                 >
@@ -200,13 +200,13 @@ export default function Messages() {
                             <h4>Message List</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="messages" />
                         </div>
                     </div>
                     <div className="mt-3">
                         <DataTable
                             columns={loading ? skeletonColumns : columns}
-                            data={ loading? Array(5).fill({}) :tablelistrowdata}
+                            data={loading ? Array(5).fill({}) : tablelistrowdata}
                             fixedHeader
                             pagination
                             paginationPerPage={5}

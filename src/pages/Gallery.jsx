@@ -185,7 +185,7 @@ const Gallery = () => {
                             <h4>Blogs List</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="gallery" />
                         </div>
                     </div>
                     <div className="mt-3">

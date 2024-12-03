@@ -140,7 +140,7 @@ const AddBlog = ({ username }) => { // Accept username as a prop
                             <h4>Add Blog</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                        <Breadcrumbs pageName="blogs" pageName1="Add Blogs"/>
                         </div>
                     </div>
                     <div className="mt-3">

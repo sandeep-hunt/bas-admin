@@ -150,7 +150,7 @@ const EditMember = () => {
                             <h4>Edit Member</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="members" pageName1="Edit Member" />
                         </div>
                     </div>
                     <div className="mt-3">

@@ -125,7 +125,7 @@ const EditBlog = () => {
                             <h4>Edit Blog</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="blogs" pageName1="Edit Blog" />
                         </div>
                     </div>
                     <div className="mt-3">

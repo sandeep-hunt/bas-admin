@@ -183,8 +183,8 @@ const EventBooking = () => {
             date: formattedDate,
             status: val?.payment_status,
             payment_id: val?.payment_id,
-            event_status:val?.event_status,
-            payment_refund_id:val?.payment_refund_id
+            event_status: val?.event_status,
+            payment_refund_id: val?.payment_refund_id
         }
     });
 
@@ -252,7 +252,7 @@ const EventBooking = () => {
                             <h4>Event Booking List</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="events" pageName1="Event Booking" />
                         </div>
                     </div>
                     <div className="mt-3">

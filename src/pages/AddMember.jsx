@@ -96,7 +96,7 @@ const AddMember = () => {
                             <h4>Add Member</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="members" pageName1="Add Members" />
                         </div>
                     </div>
                     <div className="mt-3">

@@ -213,7 +213,7 @@ const Events = () => {
                 <div className="wrapper">
                     <div className="d-flex justify-content-between align-items-center">
                         <h4>Events List</h4>
-                        <Breadcrumbs />
+                        <Breadcrumbs pageName="events" />
                     </div>
                     <div className="mt-3 d-flex justify-content-between mb-3">
                         <Button variant="primary" onClick={handleShow}>Add Event</Button>

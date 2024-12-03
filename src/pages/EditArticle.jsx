@@ -104,7 +104,7 @@ const EditArticle = () => {
                             <h4>Edit article</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                            <Breadcrumbs pageName="articles" pageName1="Edit Article" />
                         </div>
                     </div>
                     <div className="mt-3">
@@ -143,7 +143,7 @@ const EditArticle = () => {
                                                     'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
                                                     // Your account includes a free trial of TinyMCE premium features
                                                     // Try the most popular premium features until Oct 18, 2024:
-                                                    
+
                                                 ],
                                                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
                                             }}

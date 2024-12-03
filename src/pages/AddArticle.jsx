@@ -106,7 +106,7 @@ const AddArticle = ({ username, id }) => { // Accept username as a prop
                             <h4>Add article</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                        <Breadcrumbs pageName="articles" pageName1="Add Articles"/>
                         </div>
                     </div>
                     <div className="mt-3">

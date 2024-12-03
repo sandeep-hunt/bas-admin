@@ -182,7 +182,7 @@ const Articles = () => {
                             <h4>Articles List</h4>
                         </div>
                         <div className="d-flex justify-content-center align-items-center">
-                            <Breadcrumbs />
+                        <Breadcrumbs pageName="articles" />
                         </div>
                     </div>
                     <div className="mt-3">

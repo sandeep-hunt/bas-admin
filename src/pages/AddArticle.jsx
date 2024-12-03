@@ -7,8 +7,10 @@ import { Button } from 'react-bootstrap';
 import { Editor } from "@tinymce/tinymce-react";
 import axios from 'axios';
 import { Helmet } from "react-helmet";
+import { useNavigate } from 'react-router-dom';
 
 const AddArticle = ({ username, id }) => { // Accept username as a prop
+    const navigator = useNavigate();
     const [article, setarticle] = useState({ article_title: '', article_shortDesc: '', article_content: '', article_author: username || '', article_slug: '', article_page_title: '', article_page_keywords: '', article_page_desc: '' });
     const [selectedFiles, setSelectedFiles] = useState({ image1: null, image2: null, pdfs: [] });
     const [previews, setPreviews] = useState({ image1: '', image2: '', pdfs: [] });
@@ -77,13 +79,18 @@ const AddArticle = ({ username, id }) => { // Accept username as a prop
         axios.post(`${import.meta.env.VITE_BACKEND_API}articles/add`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
-            .then(response => {
-                alert('article added successfully');
-            })
-            .catch(error => {
-                console.error('Error adding article:', error);
-                setError('Failed to add article');
-            });
+        .then(response => {
+            alert('article added successfully');
+            navigator(`/articles`)
+        })
+        .catch(error => {
+            if (error.response) {
+                const errorMessage = error.response.data.message || "An error occurred while processing your request.";
+                alert(errorMessage);
+            } else {
+                alert("An unexpected error occurred. Please try again.");
+            }
+        });
     };
 
     return (

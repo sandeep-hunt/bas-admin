@@ -134,7 +134,12 @@ const Events = () => {
             fetchEvents();
             handleClose();
         } catch (error) {
-            console.error('Error saving event:', error);
+            if (error.response) {
+                const errorMessage = error.response.data.message || "An error occurred while processing your request.";
+                alert(errorMessage);
+            } else {
+                alert("An unexpected error occurred. Please try again.");
+            }
         }
     };
 

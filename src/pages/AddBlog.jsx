@@ -116,8 +116,12 @@ const AddBlog = ({ username }) => { // Accept username as a prop
                 navigator(`/blogs`)
             })
             .catch(error => {
-                console.error('Error adding blog:', error);
-                setError('Failed to add blog');
+                if (error.response) {
+                    const errorMessage = error.response.data.message || "An error occurred while processing your request.";
+                    alert(errorMessage);
+                } else {
+                    alert("An unexpected error occurred. Please try again.");
+                }
             });
     };
 

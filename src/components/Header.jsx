@@ -29,7 +29,7 @@ function Header() {
       {['lg'].map((expand) => (
         <Navbar key={expand} expand={expand} className="bg-white mb-3 shadow-sm">
           <Container>
-            <Navbar.Brand href="#">BAS Admin Panel</Navbar.Brand>
+            <Navbar.Brand href="#">Admin Panel</Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
               id={`offcanvasNavbar-expand-${expand}`}
@@ -38,7 +38,7 @@ function Header() {
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
-                  Offcanvas
+                  Admin Panel
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
